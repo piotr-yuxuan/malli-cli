@@ -66,6 +66,7 @@
 ;; -v -v -v -v non-idempotent options
 ;; --file --file --file multiple instances
 ;; --[no-]daemon
+;; What about --no-daemon dissoc :deamon when used with no arg?
 ;; --
 ;; -aeir expansion
 ;; apply validation before or after parsing (for decode, :enter or :leave chosen on :compile)
