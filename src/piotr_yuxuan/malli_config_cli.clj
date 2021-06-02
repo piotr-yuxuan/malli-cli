@@ -43,9 +43,7 @@
     (->> (mu/subschemas schema)
          (filter (comp #{:map} m/type :schema))
          (mapcat arg-options)
-         (partition 2)
-         (map vec)
-         (into {}))))
+         (apply hash-map))))
 
 (schema->options->keys Schema)
 
