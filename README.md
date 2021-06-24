@@ -29,6 +29,8 @@ workflow:
 
 # Capabilities
 
+See tests for minimal working code for each of these example.
+
 - Long option flag and value `--long-option VALUE` may give
 
 ``` clj
