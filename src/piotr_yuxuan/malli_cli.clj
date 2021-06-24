@@ -56,7 +56,8 @@
         default-name (->> path (mapcat name-items) (str/join "-") (str "--"))
         long-option (get (m/properties schema) :long-option default-name)
         short-option (get (m/properties schema) :short-option)]
-    ;; TODO here filter arg-number and update-fn for short or long options so that we can unduplicate `parse-{long|short}-option`.
+    ;; TODO here filter arg-number and update-fn for short or long
+    ;; options so that we can unduplicate `parse-{long|short}-option`.
     (cond-> nil
       long-option (conj (MapEntry. long-option grr))
       short-option (conj (MapEntry. short-option grr)))))
