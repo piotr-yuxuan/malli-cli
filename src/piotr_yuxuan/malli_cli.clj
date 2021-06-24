@@ -1,9 +1,9 @@
 (ns piotr-yuxuan.malli-cli
   (:require [clojure.data]
+            [clojure.string :as str]
             [malli.core :as m]
-            [malli.util :as mu]
             [malli.transform :as mt]
-            [clojure.string :as str])
+            [malli.util :as mu])
   (:import (clojure.lang MapEntry)))
 
 (defn children-successor
