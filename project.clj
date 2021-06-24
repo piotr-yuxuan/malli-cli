@@ -9,12 +9,13 @@
   :pom-addition [:developers [:developer
                               [:name "胡雨軒 Петр"]
                               [:url "https://github.com/piotr-yuxuan"]]]
-  :dependencies [[metosin/malli "0.5.1"]]
+  :dependencies []
   :aot :all
   :profiles {:github {:github/topics ["map" "clojure" "state-management" "component"
                                       "state" "mount" "integrant" "closeable" "deps-edn"
                                       "tools-cli" "with-open" "clojure-maps"]}
-             :provided {:dependencies [[org.clojure/clojure "1.10.3"]]}
+             :provided {:dependencies [[org.clojure/clojure "1.10.3"]
+                                       [metosin/malli "0.5.1"]]}
              :dev {:global-vars {*warn-on-reflection* true}}
              :jar {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=false"
                               "-Dclojure.compiler.direct-linking=true"]}
