@@ -54,8 +54,14 @@
                    (m/type-properties schema)
                    (m/properties schema))
         default-label (->> in (mapcat name-items) (str/join "-"))
-        long-option (get (m/properties schema) :long-option (when (< 1 (count default-label)) (str "--" default-label)))
-        short-option (get (m/properties schema) :short-option (when (= 1 (count default-label)) (str "-" default-label)))]
+        long-option (get (m/properties schema)
+                         :long-option
+                         (when (< 1 (count default-label))
+                           (str "--" default-label)))
+        short-option (get (m/properties schema)
+                          :short-option
+                          (when (= 1 (count default-label))
+                            (str "-" default-label)))]
     ;; TODO here filter arg-number and update-fn for short or long
     ;; options so that we can unduplicate `parse-{long|short}-option`.
     (cond-> nil
