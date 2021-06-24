@@ -120,7 +120,8 @@
                (drop arg-number rest-args))))))
 
 (defn break-long-option-and-value
-  "FIXME cljdoc"
+  "Expand an argument that contains both an option label and a value
+  into two arguments: the label, and the value."
   [arg rest-args]
   (into (str/split arg #"=" 2) rest-args))
 
