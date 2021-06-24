@@ -9,8 +9,7 @@
   :pom-addition [:developers [:developer
                               [:name "胡雨軒 Петр"]
                               [:url "https://github.com/piotr-yuxuan"]]]
-  :dependencies [[metosin/malli "0.5.1"]
-                 [instaparse "1.4.10"]]
+  :dependencies [[metosin/malli "0.5.1"]]
   :aot :all
   :profiles {:github {:github/topics ["map" "clojure" "state-management" "component"
                                       "state" "mount" "integrant" "closeable" "deps-edn"
