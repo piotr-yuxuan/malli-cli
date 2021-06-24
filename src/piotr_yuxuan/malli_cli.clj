@@ -36,7 +36,7 @@
         :else [(name x)]))
 
 (defn value-schemas
-  "Returns all value subschemas for unique paths as a vector of maps
+  "Returns all leaf sub schemas for unique paths as a vector of maps
   with :schema, :path and :in keys."
   [schema]
   (->> schema
