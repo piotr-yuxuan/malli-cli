@@ -10,44 +10,39 @@ Command-line arguments with malli.
 This library provides out-of-the-box cli parsing. It exposes a
 function which takes a vector of strings `args` as input and return a
 map that can later be merged with the config. As such it intends to
-play nicely with configuration tools like 1Config, so you may consider
-configuration values from different sources:
+play nicely with configuration tools, so you may have the following workflow:
 
-1. Default configuration value;
-2. Configuration as stored in 1Config;
-3. One-off configuration overrides in your command-line arguments;
+- Retrieve value from some configuration management system ;
+- Consider command line arguments as configuration ad-hoc overrides, tokenise them and structure them into a map of command-line options;
+- Merge the two partial values above and fill the blank with default values;
+- If the resulting value conforms to what you expect (schema validation) you may finally use it with confidence.
 
-then you may merge these values to get the actual, concrete
-configuration. For example with this config schema:
+Let's consider this config schema:
 
 ``` clojure
 (def Config
   (m/schema
     [:map {:closed true}
-     [:upload-api {:short-option "-a"
-                   :default "http://localhost:8080"
-                   :description "Address of target api instance."}
-       string?]
-     [:market {:default "MARKET_CODE"
-               :description "Must be the string representation of a market code as defined in our data model."}
-       [:enum "OUTER_SPACE" "MARKET_CODE"]]
-     [:data [:map
-       [:format {:decode/string keyword
-                 :description "The type of the resource file to upload."}
-         [:enum :line-json :line-edn]]
-       [:file {:decode/string keyword
-               :description "The type of the resource file to upload."}
-         string?]]]
-     [:proxy
-       [:map
-         [:host string?]
-         [:port pos-int?]]]
-     [:async-parallelism {:default 64
-                          :description "Parallelism factor for `core.async`."}
-       pos-int?]]))
+     [:help [boolean? {:short-option "-h"
+                       :optional true
+                       :arg-number 0}]]
+     [:upload-api [string?
+                   {:short-option "-a"
+                    :default "http://localhost:8080"
+                    :description "Address of target upload-api instance."}]]
+     [:log-level [:enum {:decode/string keyword
+                         :short-option "-v"
+                         :short-option/arg-number 0
+                         :short-option/update-fn (fn [options {:keys [path schema]} _cli-args]
+                                                   (update-in options path (malli-cli/children-successor schema)))
+                         :default :error}
+                  :off :fatal :error :warn :info :debug :trace :all]]
+     [:proxy [:map
+              [:host string?]
+              [:port pos-int?]]]]))
 ```
 
-and this config value retrieved from your configuration system:
+Also, here is what your configuration system provides:
 
 ``` clojure
 {:upload-api "https://example.com/upload"
@@ -55,30 +50,24 @@ and this config value retrieved from your configuration system:
          :port 3128}}
 ```
 
-you can invoke your Clojure main function with:
+You may invoke your Clojure main function with:
 
 ``` zsh
-lein run -m upload-job \
-  --market OUTER_SPACE \
-  --upload-data-format line-json \
-  --upload-data-file ./latest-data-file.edn
+lein run \
+  --help -vvv \
+  -a "https://localhost:3004"
 ```
 
 and the resulting configuration passed to your app will be:
 
 ``` clojure
-{;; Set as the default value
- :async-parallelism 64
- ;; Set from your configuration system
+{:help true
  :upload-api "https://example.com/upload"
+ :log-level :debug
  :proxy {;; Nested config maps are supported
          :host "http://proxy.example.com"
+         ;; malli transform strings into appropriate types
          :port 3128}
- ;; Set from command-line overrides
- :market "OUTER_SPACE"
- :upload/data {;; Namespaced keywords are supported, too.
-               :format :line-json
-               :file "./latest-data-file.edn"}}
 ```
 
 From a technical point of view, it leverages malli coercion and
@@ -97,7 +86,7 @@ command-line interface from it.
                         :env (env)
                         :version (version)}))
     ;; Command-line overrides
-    (malli-cli/parse args)))
+    (m/decode Config args malli-cli/simple-cli-options-transformer)))
 
 (defn -main
   [& args]
@@ -109,10 +98,3 @@ command-line interface from it.
           (Thread/sleep 60000) ; Leave some time to retrieve the logs.
           (System/exit 1)))))
 ```
-
-todo
-
-This library tries its best to implement these standard guidelines:
-
-- https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html
-- https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
