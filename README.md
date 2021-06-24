@@ -99,7 +99,9 @@ workflow:
   complex behaviour, like for example `--name Piotr`:
 
 ```
-{:name ">> Piotr <<"}
+{:vanity-name ">> Piotr <<"
+ :original-name "Piotr"
+ :first-letter \P}
 ```
 
 # Simple example
