@@ -1,11 +1,11 @@
-# `malli-config-cli`
+# `malli-cli`
 
 Command-line arguments with malli.
 
-[![](https://img.shields.io/clojars/v/piotr-yuxuan/malli-config-cli.svg)](https://clojars.org/piotr-yuxuan/malli-config-cli)
-[![cljdoc badge](https://cljdoc.org/badge/piotr-yuxuan/malli-config-cli)](https://cljdoc.org/d/piotr-yuxuan/malli-config-cli/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-config-cli)](https://github.com/piotr-yuxuan/malli-config-cli/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-config-cli)](https://github.com/piotr-yuxuan/malli-config-cli/issues)
+[![](https://img.shields.io/clojars/v/piotr-yuxuan/malli-cli.svg)](https://clojars.org/piotr-yuxuan/malli-cli)
+[![cljdoc badge](https://cljdoc.org/badge/piotr-yuxuan/malli-cli)](https://cljdoc.org/d/piotr-yuxuan/malli-cli/CURRENT)
+[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
 
 This library provides out-of-the-box cli parsing. It exposes a
 function which takes a vector of strings `args` as input and return a
@@ -97,7 +97,7 @@ command-line interface from it.
                         :env (env)
                         :version (version)}))
     ;; Command-line overrides
-    (malli-config-cli/parse args)))
+    (malli-cli/parse args)))
 
 (defn -main
   [& args]
@@ -109,3 +109,10 @@ command-line interface from it.
           (Thread/sleep 60000) ; Leave some time to retrieve the logs.
           (System/exit 1)))))
 ```
+
+todo
+
+This library tries its best to implement these standard guidelines:
+
+- https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html
+- https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html

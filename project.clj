@@ -1,15 +1,17 @@
-(defproject piotr-yuxuan/malli-config-cli (-> "./resources/malli-config-cli.version" slurp .trim)
+(defproject piotr-yuxuan/malli-cli (-> "./resources/malli-cli.version" slurp .trim)
   :description "A Clojure map which implements java.io.Closeable"
-  :url "https://github.com/piotr-yuxuan/malli-config-cli"
+  :url "https://github.com/piotr-yuxuan/malli-cli"
   :license {:name "European Union Public License 1.2 or later"
             :url "https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12"
             :distribution :repo}
   :scm {:name "git"
-        :url "https://github.com/piotr-yuxuan/malli-config-cli"}
+        :url "https://github.com/piotr-yuxuan/malli-cli"}
   :pom-addition [:developers [:developer
                               [:name "胡雨軒 Петр"]
                               [:url "https://github.com/piotr-yuxuan"]]]
-  :dependencies [[metosin/malli "0.5.1"]]
+  :dependencies [[metosin/malli "0.5.1"]
+                 [org.clojure/tools.cli "1.0.206"]
+                 [instaparse "1.4.10"]]
   :aot :all
   :profiles {:github {:github/topics ["map" "clojure" "state-management" "component"
                                       "state" "mount" "integrant" "closeable" "deps-edn"
@@ -24,6 +26,6 @@
                                     :username :env/WALTER_CLOJARS_USERNAME
                                     :password :env/WALTER_CLOJARS_PASSWORD}]
                         ["github" {:sign-releases false
-                                   :url "https://maven.pkg.github.com/piotr-yuxuan/malli-config-cli"
+                                   :url "https://maven.pkg.github.com/piotr-yuxuan/malli-cli"
                                    :username :env/GITHUB_ACTOR
                                    :password :env/WALTER_GITHUB_PASSWORD}]])
