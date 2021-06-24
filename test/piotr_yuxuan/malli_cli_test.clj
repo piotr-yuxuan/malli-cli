@@ -178,8 +178,8 @@
                   keyword?
                   [:enum {:short-option "-v"
                           :short-option/arg-number 0
-                          :short-option/update-fn (fn [options {:keys [path schema]} _cli-args]
-                                                    (update-in options path (malli-cli/children-successor schema)))
+                          :short-option/update-fn (fn [options {:keys [in schema]} _cli-args]
+                                                    (update-in options in (malli-cli/children-successor schema)))
                           :default :info}
                    :off :fatal :error :warn :info :debug :trace :all]]]
      [:upload-api [string?
@@ -192,8 +192,8 @@
      [:markets [:vector
                 [:enum {:decode/string keyword
                         :long-option "--market"
-                        :update-fn (fn [options {:keys [path]} [market]]
-                                     (update-in options path conj market))
+                        :update-fn (fn [options {:keys [in]} [market]]
+                                     (update-in options in conj market))
                         :default :FRANCE
                         :description "Must be the string representation of a market code as from Viooh data model."}
                  :FRANCE :UNITED_KINGDOM]]]
