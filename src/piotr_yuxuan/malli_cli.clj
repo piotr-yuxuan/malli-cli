@@ -46,14 +46,14 @@
 (defn label->value-schema
   "Return `MapEntry` items, when applicable one for short, and long
   option names."
-  [{:keys [path schema] :as value-schema}]
-  (let [path (remove #(and (keyword? %) (= (namespace %) "malli.core")) path)
+  [{:keys [in schema] :as value-schema}]
+  (let [in (remove #(and (keyword? %) (= (namespace %) "malli.core")) in)
         default-value-schema {:arg-number 1}
         grr (merge default-value-schema
-                   (assoc value-schema :path path)
+                   (assoc value-schema :in in)
                    (m/type-properties schema)
                    (m/properties schema))
-        default-name (->> path (mapcat name-items) (str/join "-") (str "--"))
+        default-name (->> in (mapcat name-items) (str/join "-") (str "--"))
         long-option (get (m/properties schema) :long-option default-name)
         short-option (get (m/properties schema) :short-option)]
     ;; TODO here filter arg-number and update-fn for short or long
@@ -67,16 +67,16 @@
   on the value schema consume some items from the tail and when
   applicable pass them on to `update-fn`. This is actually the core of
   the work that transforms a vector of string to a map of options."
-  [{:keys [path update-fn arg-number] :as value-schema} options arg rest-args]
+  [{:keys [in update-fn arg-number] :as value-schema} options arg rest-args]
   (cond (not value-schema) [(update options ::invalid conj arg)
                             rest-args]
         (and update-fn arg-number) [(update-fn options value-schema (take arg-number rest-args))
                                     (drop arg-number rest-args)]
-        (= 0 arg-number) [(assoc-in options path true)
+        (= 0 arg-number) [(assoc-in options in true)
                           rest-args]
-        (= 1 arg-number) [(assoc-in options path (first rest-args))
+        (= 1 arg-number) [(assoc-in options in (first rest-args))
                           (rest rest-args)]
-        (number? arg-number) [(assoc-in options path (take arg-number rest-args))
+        (number? arg-number) [(assoc-in options in (take arg-number rest-args))
                               (drop arg-number rest-args)]))
 
 (defn parse-long-option
