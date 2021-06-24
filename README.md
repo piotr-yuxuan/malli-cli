@@ -29,7 +29,7 @@ workflow:
 
 # Capabilities
 
-See tests for minimal working code for each of these example.
+See tests for minimal working code for each of these examples.
 
 - Long option flag and value `--long-option VALUE` may give
 
