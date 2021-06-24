@@ -65,7 +65,7 @@ See tests for minimal working code for each of these examples.
 ``` clj
 {:option-a 1
  :option-b 2
- :piotr-yuxuan.malli-cli/arguments [ARG0 ARG1 ARG2]}
+ :piotr-yuxuan.malli-cli/arguments ["ARG0" "ARG1" "ARG2"]}
 ```
 
 - Grouped short flags like `-hal` are expanded like, for example:
