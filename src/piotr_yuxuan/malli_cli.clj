@@ -63,7 +63,10 @@
       short-option (conj (MapEntry. short-option grr)))))
 
 (defn -parse-option
-  "FIXME cljdoc"
+  "Take the current arglist head `arg`, the tail `rest-args`. Depending
+  on the value schema consume some items from the tail and when
+  applicable pass them on to `update-fn`. This is actually the core of
+  the work that transforms a vector of string to a map of options."
   [{:keys [path update-fn arg-number] :as value-schema} options arg rest-args]
   (cond (not value-schema) [(update options ::invalid conj arg)
                             rest-args]
