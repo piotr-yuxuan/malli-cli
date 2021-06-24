@@ -126,7 +126,17 @@
   (into (str/split arg #"=" 2) rest-args))
 
 (defn parse-args
-  "FIXME cljdoc"
+  "Entry point to the technical work of turning a sequece of arguments
+  `args` into a map that (maybe) conforms to a `schema`. It returns a
+  map of the options as parsed according to the schema, but with two
+  additional keys:
+
+  - `::arguments` is a vector of application arguments, that is to say
+    command-line arguments that do not represent an option value.
+
+  - `::cli-args` is the raw, untouched vector of command-line
+    arguments received as input. Perhaps you need it for some
+    additional validation of positional logic."
   [schema args]
   (let [label->value-schemas (->> (value-schemas schema)
                                   (mapcat label->value-schema)
