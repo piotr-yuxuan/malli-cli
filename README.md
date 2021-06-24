@@ -1,4 +1,4 @@
-# `malli-cli`
+# `piotr-yuxuan/malli-cli`
 
 Command-line arguments with malli.
 
