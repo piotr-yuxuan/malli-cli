@@ -7,43 +7,59 @@ Command-line arguments with malli.
 [![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
 
+Maturity notice: it is currently under development but can already
+provide some help. The error handling should be improved before it is
+considered more stable.
+
 # What it offers
 
 This library provides out-of-the-box cli parsing. It exposes a
 function which takes a vector of strings `args` as input and return a
 map that can later be merged with the config. As such it intends to
-play nicely with configuration tools, so you may have the following workflow:
+play nicely with configuration tools, so you may have the following
+workflow:
 
 - Retrieve value from some configuration management system ;
-- Consider command line arguments as configuration ad-hoc overrides, tokenise them and structure them into a map of command-line options;
-- Merge the two partial values above and fill the blank with default values;
-- If the resulting value conforms to what you expect (schema validation) you may finally use it with confidence.
+- Consider command line arguments as configuration ad-hoc overrides,
+  tokenise them and structure them into a map of command-line options;
+- Merge the two partial values above and fill the blank with default
+  values;
+- If the resulting value conforms to what you expect (schema
+  validation) you may finally use it with confidence.
 
 # Capabilities
 
 - Long option flag and value `--long-option VALUE` may give
+
 ``` clj
 {:long-option "VALUE"}
 ```
 
 - Grouped flag and value with `--long-option=VALUE` may give
+
 ``` clj
 {:long-option "VALUE"}
 ```
 
 - Short option names with `-s VALUE` may give
+
 ``` clj
 {:some-option "VALUE"}
 ```
 
-- Options that accept a variable number of arguments: `-a -b val0 --c val1 val2`
+- Options that accept a variable number of arguments: `-a -b val0 --c
+  val1 val2`
+
 ``` clj
 {:option-a true
  :option-b "val0"
  :option-c ["val1" "val2"]}
 ```
 
-- Non-option arguments are supported directly amongst options, or after a double-dash so `-a 1 ARG0 -b 2 -- ARG1 ARG2` may be equivalent to:
+- Non-option arguments are supported directly amongst options, or
+  after a double-dash so `-a 1 ARG0 -b 2 -- ARG1 ARG2` may be
+  equivalent to:
+
 ``` clj
 {:option-a 1
  :option-b 2
@@ -64,18 +80,24 @@ play nicely with configuration tools, so you may have the following workflow:
 {:log-level :debug}
 ```
 
-- You may use nested maps in your config schema so that `--proxy-host https://example.org/upload --proxy-port 3447` is expanded as:
+- You may use nested maps in your config schema so that `--proxy-host
+  https://example.org/upload --proxy-port 3447` is expanded as:
+
 ``` clj
 {:proxy {:host "https://example.org/upload"
          :port 3447}}
 ```
 
-- Namespaced keyword are allowed, albeit the command-line option name stays simple `--upload-parallelism 32` may give:
+- Namespaced keyword are allowed, albeit the command-line option name
+  stays simple `--upload-parallelism 32` may give:
+
 ```clj
 {:upload/parallelism 32}
 ```
 
-- You can provide your own code to update the result map with some complex behaviour, like for example `--name Piotr`:
+- You can provide your own code to update the result map with some
+  complex behaviour, like for example `--name Piotr`:
+
 ```
 {:name ">> Piotr <<"}
 ```
