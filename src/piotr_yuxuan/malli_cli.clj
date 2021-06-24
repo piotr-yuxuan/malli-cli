@@ -102,7 +102,9 @@
                  options arg rest-args))
 
 (defn break-short-option-group
-  "FIXME cljdoc"
+  "Expand a group of short option labels into a several short labels and
+  interpolate them with the tail of the arglist `rest-args` depending
+  on the number of arguments each option needs. "
   [label->value-schemas arg rest-args]
   (loop [[{:keys [short-option] :as value-schema} & ss] (->> (rest arg)
                                                              (map #(str "-" %))
