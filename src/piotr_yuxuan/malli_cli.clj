@@ -182,7 +182,11 @@
                rest-args)))))
 
 (def cli-args-transformer
-  "FIXME cljdoc"
+  "The malli transformer wrapping `parse-args`. To be used it with
+  `m/decode`, wrapped by `mt/transformer`. Merely turn a sequence of
+  arguments `args` into a map that (maybe) conforms to a `schema`. You
+  can compose this transformer to further refine command-line argument
+  parsing. See `simple-cli-options-transformer` for an example."
   {:name :cli-args-transformer
    :compile (fn [schema _]
               (fn [args]
