@@ -76,7 +76,7 @@
                           rest-args]
         (= 1 arg-number) [(assoc-in options in (first rest-args))
                           (rest rest-args)]
-        (number? arg-number) [(assoc-in options in (take arg-number rest-args))
+        (number? arg-number) [(assoc-in options in (vec (take arg-number rest-args)))
                               (drop arg-number rest-args)]))
 
 (defn parse-long-option
