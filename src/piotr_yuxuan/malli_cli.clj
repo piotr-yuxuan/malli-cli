@@ -35,7 +35,8 @@
         :else [(name x)]))
 
 (defn value-schemas
-  "FIXME cljdoc The type schema, not yet the parsing schema."
+  "Returns all value subschemas for unique paths as a vector of maps
+  with :schema, :path and :in keys."
   [schema]
   (->> schema
        mu/subschemas
