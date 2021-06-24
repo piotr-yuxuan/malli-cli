@@ -3,7 +3,8 @@
             [malli.core :as m]
             [malli.util :as mu]
             [malli.transform :as mt]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import (clojure.lang MapEntry)))
 
 (defn children-successor
   "Given a schema `[:enum :a :b :c :d]`, return a Clojure map that
@@ -43,7 +44,8 @@
        (remove (comp #{:map} m/type :schema))))
 
 (defn label->value-schema
-  "FIXME cljdoc"
+  "Return `MapEntry` items, when applicable one for short, and long
+  option names."
   [{:keys [path schema] :as value-schema}]
   (let [path (remove #(and (keyword? %) (= (namespace %) "malli.core")) path)
         default-value-schema {:arg-number 1}
@@ -56,8 +58,8 @@
         short-option (get (m/properties schema) :short-option)]
     ;; TODO here filter arg-number and update-fn for short or long options so that we can unduplicate `parse-{long|short}-option`.
     (cond-> nil
-      long-option (conj [long-option grr])
-      short-option (conj [short-option grr]))))
+      long-option (conj (MapEntry. long-option grr))
+      short-option (conj (MapEntry. short-option grr)))))
 
 (defn -parse-option
   "FIXME cljdoc"
