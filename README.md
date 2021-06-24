@@ -98,7 +98,7 @@ workflow:
 - You can provide your own code to update the result map with some
   complex behaviour, like for example `--name Piotr`:
 
-```
+``` clj
 {:vanity-name ">> Piotr <<"
  :original-name "Piotr"
  :first-letter \P}
