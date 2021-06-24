@@ -241,3 +241,116 @@
             :database "http://localhost:8888",
             :async-parallelism 64,
             :create-market-dataset false}))))
+
+(deftest capability-test
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:long-option string?]]
+           ["--long-option" "VALUE"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:long-option "VALUE"}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:long-option string?]]
+           ["--long-option=VALUE"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:long-option "VALUE"}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:some-option [string? {:short-option "-s"}]]]
+           ["--some-option" "VALUE"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:some-option "VALUE"}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:a [boolean? {:arg-number 0}]]
+            [:b string?]
+            [:c [string? {:arg-number 2}]]]
+           ["-a" "-b" "val0" "-c" "val1" "val2"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:a true
+          :b "val0"
+          :c ["val1" "val2"]}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:a [boolean? {:arg-number 0}]]
+            [:b string?]]
+           ["-a" "1" "ARG0" "-b" "2" "--" "ARG1" "ARG2"]
+           (mt/transformer malli-cli/cli-args-transformer))
+         {:a true,
+          :b "2",
+          ::malli-cli/arguments ["1" "ARG0" "ARG1" "ARG2"],
+          ::malli-cli/cli-args ["-a" "1" "ARG0" "-b" "2" "--" "ARG1" "ARG2"]}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:help [boolean? {:short-option "-h" :arg-number 0}]]
+            [:all [boolean? {:short-option "-a" :arg-number 0}]]
+            [:list [boolean? {:short-option "-l" :arg-number 0}]]]
+           ["-hal"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:help true
+          :all true
+          :list true}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:log-level [:and
+                         keyword?
+                         [:enum {:short-option "-v"
+                                 :short-option/arg-number 0
+                                 :short-option/update-fn (fn [options {:keys [in schema]} _cli-args]
+                                                           (update-in options in (malli-cli/children-successor schema)))
+                                 :default :error}
+                          :off :fatal :error :warn :info :debug :trace :all]]]]
+           ["-vvv"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:log-level :debug}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:verbosity [int? {:short-option "-v"
+                               :short-option/arg-number 0
+                               :short-option/update-fn (fn [options {:keys [in]} _cli-args]
+                                                         (update-in options in (fnil inc 0)))
+                               :default 0}]]]
+           ["-vvv"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:verbosity 3}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:proxy [:map
+                     [:host string?]
+                     [:port pos-int?]]]]
+           ["--proxy-host" "https://example.org/upload" "--proxy-port" "3447"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:proxy {:host "https://example.org/upload"
+                  :port 3447}}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:upload/parallelism pos-int?]]
+           ["--upload-parallelism" 32]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:upload/parallelism 32}))
+
+  (is (= (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:vanity-name [string? {:long-option "--name"
+                                    :update-fn (fn [options {:keys [in]} [username]]
+                                                 (-> options
+                                                     (assoc :vanity-name (format ">> %s <<" username))
+                                                     (assoc :original-name username)
+                                                     (assoc :first-letter (first username))))}]]
+            [:original-name string?]
+            [:first-letter char?]]
+           ["--name" "Piotr"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         {:vanity-name ">> Piotr <<"
+          :original-name "Piotr"
+          :first-letter \P})))
