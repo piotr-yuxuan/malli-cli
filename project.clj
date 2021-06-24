@@ -10,7 +10,6 @@
                               [:name "胡雨軒 Петр"]
                               [:url "https://github.com/piotr-yuxuan"]]]
   :dependencies [[metosin/malli "0.5.1"]
-                 [org.clojure/tools.cli "1.0.206"]
                  [instaparse "1.4.10"]]
   :aot :all
   :profiles {:github {:github/topics ["map" "clojure" "state-management" "component"
