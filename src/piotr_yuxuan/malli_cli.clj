@@ -26,8 +26,9 @@
       (contains? properties :default) (as-> $ (assoc $ nil (get $ (:default properties))))
       :loop-on-last (assoc last-child last-child))))
 
-(defn kw-ns
-  "FIXME cljdoc"
+(defn name-items
+  "Take an argument and return a vector of items that will form an
+  option name. For example the option name for `:a/b` will be a-b."
   [x]
   (cond (not (keyword? x)) [(str x)]
         (namespace x) [(namespace x) (name x)]
@@ -49,7 +50,7 @@
                    (assoc value-schema :path path)
                    (m/type-properties schema)
                    (m/properties schema))
-        default-name (->> path (mapcat kw-ns) (str/join "-") (str "--"))
+        default-name (->> path (mapcat name-items) (str/join "-") (str "--"))
         long-option (get (m/properties schema) :long-option default-name)
         short-option (get (m/properties schema) :short-option)]
     ;; TODO here filter arg-number and update-fn for short or long options so that we can unduplicate `parse-{long|short}-option`.

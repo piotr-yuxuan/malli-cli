@@ -19,10 +19,10 @@
           :d :d})))
 
 (deftest kw-ns-test
-  (is (= ["a"] (malli-cli/kw-ns :a)))
-  (is (= ["a" "b"] (malli-cli/kw-ns :a/b)))
-  (is (= ["a" "b" "c" "d"] (mapcat malli-cli/kw-ns [:a :b/c :d])))
-  (is (= ["0" "a" "b" "c" "d" "e"] (mapcat malli-cli/kw-ns [0 :a :b/c #"d" 'e]))))
+  (is (= ["a"] (malli-cli/name-items :a)))
+  (is (= ["a" "b"] (malli-cli/name-items :a/b)))
+  (is (= ["a" "b" "c" "d"] (mapcat malli-cli/name-items [:a :b/c :d])))
+  (is (= ["0" "a" "b" "c" "d" "e"] (mapcat malli-cli/name-items [0 :a :b/c #"d" 'e]))))
 
 (deftest config-option-schemas-test
   (is (= (malli-cli/value-schemas [:map [:a int?]])
