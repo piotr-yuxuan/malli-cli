@@ -154,7 +154,7 @@ and the resulting configuration passed to your app will be:
 
 ``` clojure
 {:help true
- :upload-api "https://example.com/upload"
+ :upload-api "https://localhost:3004"
  :log-level :debug
  :proxy {;; Nested config maps are supported
          :host "http://proxy.example.com"
