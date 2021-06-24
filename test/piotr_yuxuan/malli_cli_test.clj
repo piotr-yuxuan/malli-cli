@@ -25,8 +25,6 @@
   (is (= ["0" "a" "b" "c" "d" "e"] (mapcat malli-cli/name-items [0 :a :b/c #"d" 'e]))))
 
 (deftest config-option-schemas-test
-  (is (= (malli-cli/value-schemas [:map [:a int?]])
-         '({:path [:a], :in [:a], :schema int?})))
   (let [type-schemas (malli-cli/value-schemas [:map
                                                [:a [:map
                                                     [:b int?]
