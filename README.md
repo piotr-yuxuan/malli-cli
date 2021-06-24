@@ -107,6 +107,9 @@ workflow:
 Let's consider this config schema:
 
 ``` clojure
+(require '[piotr-yuxuan.malli-cli :as malli-cli])
+(require '[malli.core :as m])
+
 (def Config
   (m/schema
     [:map {:closed true}
@@ -163,6 +166,9 @@ configuration and default value in one place, then derive a
 command-line interface from it.
 
 ``` clojure
+(require '[piotr-yuxuan.malli-cli :as malli-cli])
+(require '[malli.core :as m])
+
 (defn load-config
   [args]
   (deep-merge
