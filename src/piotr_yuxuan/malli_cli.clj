@@ -192,7 +192,7 @@
                  arguments
                  interleaved-rest-args))
 
-        :else
+        :application-argument
         (recur options
                (conj arguments arg)
                rest-args)))))
