@@ -2,7 +2,7 @@
 
 Command-line arguments with malli.
 
-[![](https://img.shields.io/clojars/v/piotr-yuxuan/malli-cli.svg)](https://clojars.org/piotr-yuxuan/malli-cli)
+[![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/malli-cli.svg)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
 [![cljdoc badge](https://cljdoc.org/badge/piotr-yuxuan/malli-cli)](https://cljdoc.org/d/piotr-yuxuan/malli-cli/CURRENT)
 [![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
