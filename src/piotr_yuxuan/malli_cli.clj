@@ -78,7 +78,7 @@
                    (assoc :update-fn (or (:short-option/update-fn value-schema)
                                          (:update-fn value-schema)))))))
 
-(defn label->value-schema
+(defn label+value-schema
   "Return `MapEntry` items, when applicable one for short, and long
   option names."
   [{:keys [in schema] :as value-schema}]
@@ -87,9 +87,8 @@
         value-schema' (-> value-schema
                           (merge (m/type-properties schema) (m/properties schema))
                           (assoc :in in'))]
-    (conj {}
-          (long-option->value-schema default-label value-schema')
-          (short-option->value-schema default-label value-schema'))))
+    [(long-option->value-schema default-label value-schema')
+     (short-option->value-schema default-label value-schema')]))
 
 (defrecord ParsingResult
   [options argstail])
@@ -117,10 +116,10 @@
   "Expand a group of short option labels into a several short labels and
   interpolate them with the tail of the arglist args-tail` depending
   on the number of arguments each option needs. "
-  [label->value-schemas arg argstail]
+  [label+value-schemas arg argstail]
   (loop [[{:keys [arg-number short-option] :as value-schema} & ss] (->> (rest arg)
                                                                         (map #(str "-" %))
-                                                                        (map label->value-schemas))
+                                                                        (map label+value-schemas))
          interpolated-args ()
          argstail argstail]
     (if (nil? value-schema)
@@ -148,9 +147,9 @@
     arguments received as input. Perhaps you need it for some
     additional validation of positional logic."
   [schema args]
-  (let [label->value-schemas (->> (value-schemas schema)
-                                  (mapcat label->value-schema)
-                                  (into {}))]
+  (let [label+value-schemas (->> (value-schemas schema)
+                                 (mapcat label+value-schema)
+                                 (into {}))]
     ;; TODO Validate assumption on schema.
     (loop [options {}
            arguments []
@@ -162,18 +161,18 @@
 
         (or (re-seq #"^--\S+$" arg)
             (re-seq #"^-\S$" arg))
-        (if-let [value-schema (get label->value-schemas arg)]
+        (if-let [value-schema (get label+value-schemas arg)]
           (let [parsing-result (-parse-option value-schema options arg argstail)]
             (recur (.-options parsing-result)
                    arguments
                    (.-argstail parsing-result)))
           (recur (-> options
                      (update ::unknown-option-errors conj {:arg arg})
-                     (assoc ::known-options (keys label->value-schemas)))
+                     (assoc ::known-options (keys label+value-schemas)))
                  arguments
                  argstail))
 
-        (re-seq #"^-\S+$" arg) (recur options arguments (break-short-option-group label->value-schemas arg argstail))
+        (re-seq #"^-\S+$" arg) (recur options arguments (break-short-option-group label+value-schemas arg argstail))
         :application-argument (recur options (conj arguments arg) argstail)))))
 
 (def cli-args-transformer
