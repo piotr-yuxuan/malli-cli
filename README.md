@@ -7,10 +7,6 @@ Command-line arguments with malli.
 [![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
 
-Maturity notice: it is currently under development but can already
-provide some help. The error handling should be improved before it is
-considered more stable.
-
 # What it offers
 
 This library provides out-of-the-box cli parsing. It exposes a
