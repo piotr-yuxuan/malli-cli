@@ -43,30 +43,53 @@
        mu/subschemas
        (remove (comp #{:map} m/type :schema))))
 
+(def ^{:arglists '([f m])}
+  remove-key
+  #(#'clojure.core/filter-key first (complement %1) %2))
+
+(def default-arg-number
+  1)
+
+(defn long-option->value-schema
+  [default-label value-schema]
+  (when-let [long-option (get value-schema
+                              :long-option
+                              (when (< 1 (count default-label))
+                                (str "--" default-label)))]
+    (MapEntry. long-option
+               (-> (remove-key (comp #{"long-option" "short-option"} namespace) value-schema)
+                   (assoc :arg-number (or (:long-option/arg-number value-schema)
+                                          (:arg-number value-schema)
+                                          default-arg-number))
+                   (assoc :update-fn (or (:long-option/update-fn value-schema)
+                                         (:update-fn value-schema)))))))
+
+(defn short-option->value-schema
+  [default-label value-schema]
+  (when-let [short-option (get value-schema
+                               :short-option
+                               (when (= 1 (count default-label))
+                                 (str "-" default-label)))]
+    (MapEntry. short-option
+               (-> (remove-key (comp #{"long-option" "short-option"} namespace) value-schema)
+                   (assoc :arg-number (or (:short-option/arg-number value-schema)
+                                          (:arg-number value-schema)
+                                          default-arg-number))
+                   (assoc :update-fn (or (:short-option/update-fn value-schema)
+                                         (:update-fn value-schema)))))))
+
 (defn label->value-schema
   "Return `MapEntry` items, when applicable one for short, and long
   option names."
   [{:keys [in schema] :as value-schema}]
-  (let [in (remove #(and (keyword? %) (= (namespace %) "malli.core")) in)
-        default-value-schema {:arg-number 1}
-        grr (merge default-value-schema
-                   (assoc value-schema :in in)
-                   (m/type-properties schema)
-                   (m/properties schema))
-        default-label (->> in (mapcat name-items) (str/join "-"))
-        long-option (get (m/properties schema)
-                         :long-option
-                         (when (< 1 (count default-label))
-                           (str "--" default-label)))
-        short-option (get (m/properties schema)
-                          :short-option
-                          (when (= 1 (count default-label))
-                            (str "-" default-label)))]
-    ;; TODO here filter arg-number and update-fn for short or long
-    ;; options so that we can unduplicate `parse-{long|short}-option`.
-    (cond-> nil
-      long-option (conj (MapEntry. long-option grr))
-      short-option (conj (MapEntry. short-option grr)))))
+  (let [in' (remove #(and (keyword? %) (= (namespace %) "malli.core")) in)
+        default-label (->> in' (mapcat name-items) (str/join "-"))
+        value-schema' (-> value-schema
+                          (merge (m/type-properties schema) (m/properties schema))
+                          (assoc :in in'))]
+    (conj {}
+          (long-option->value-schema default-label value-schema')
+          (short-option->value-schema default-label value-schema'))))
 
 (defn -parse-option
   "Take the current arglist head `arg`, the tail `rest-args`. Depending

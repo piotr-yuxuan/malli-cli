@@ -59,7 +59,7 @@
                 (mapcat malli-cli/label->value-schema)
                 (into {})
                 keys)
-           ["--youp" "-y" "--node-0-default-long-option-name" "-b" "--foo"]))))
+           ["--youp" "--node-0-default-long-option-name" "-y" "--foo" "-b"]))))
 
 (deftest parse-option-test
   (testing "top-level option"
