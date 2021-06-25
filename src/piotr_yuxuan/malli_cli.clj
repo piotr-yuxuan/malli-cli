@@ -108,28 +108,6 @@
         (number? arg-number) [(assoc-in options in (vec (take arg-number rest-args)))
                               (drop arg-number rest-args)]))
 
-(defn parse-long-option
-  "FIXME cljdoc"
-  [value-schema options arg rest-args]
-  ;; FIXME Change label->value-schema instead.
-  (-parse-option (assoc value-schema
-                   :arg-number (or (:long-option/arg-number value-schema)
-                                   (:arg-number value-schema))
-                   :update-fn (or (:long-option/update-fn value-schema)
-                                  (:update-fn value-schema)))
-                 options arg rest-args))
-
-(defn parse-short-option
-  "FIXME cljdoc"
-  [value-schema options arg rest-args]
-  ;; FIXME Change label->value-schema instead.
-  (-parse-option (assoc value-schema
-                   :arg-number (or (:short-option/arg-number value-schema)
-                                   (:arg-number value-schema))
-                   :update-fn (or (:short-option/update-fn value-schema)
-                                  (:update-fn value-schema)))
-                 options arg rest-args))
-
 (defn break-short-option-group
   "Expand a group of short option labels into a several short labels and
   interpolate them with the tail of the arglist `rest-args` depending
@@ -191,23 +169,16 @@
                  arguments
                  new-rest-args))
 
-        (re-seq #"^--\S+$" arg)
+        (or (re-seq #"^--\S+$" arg)
+            (re-seq #"^-\S$" arg))
         (if-let [value-schema (get label->value-schemas arg)]
-          (let [[options rest-args] (parse-long-option value-schema options arg rest-args)]
+          (let [[options rest-args] (-parse-option value-schema options arg rest-args)]
             (recur options arguments rest-args))
-          (let [options+errors (-> options
-                                   (update ::unknown-options conj arg)
-                                   (assoc ::known-options (keys label->value-schemas)))]
-            (recur options+errors arguments rest-args)))
-
-        (re-seq #"^-\S$" arg)
-        (if-let [value-schema (get label->value-schemas arg)]
-          (let [[options rest-args] (parse-short-option value-schema options arg rest-args)]
-            (recur options arguments rest-args))
-          (let [options+errors (-> options
-                                   (update ::unknown-options conj arg)
-                                   (assoc ::known-options (keys label->value-schemas)))]
-            (recur options+errors arguments rest-args)))
+          (recur (-> options
+                     (update ::unknown-options conj arg)
+                     (assoc ::known-options (keys label->value-schemas)))
+                 arguments
+                 rest-args))
 
         (re-seq #"^-\S+$" arg)
         (let [interleaved-rest-args (break-short-option-group label->value-schemas arg rest-args)]
