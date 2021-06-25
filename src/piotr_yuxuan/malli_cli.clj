@@ -169,12 +169,22 @@
                  new-rest-args))
 
         (re-seq #"^--\S+$" arg)
-        (let [[options rest-args] (parse-long-option (get label->value-schemas arg) options arg rest-args)]
-          (recur options arguments rest-args))
+        (if-let [value-schema (get label->value-schemas arg)]
+          (let [[options rest-args] (parse-long-option value-schema options arg rest-args)]
+            (recur options arguments rest-args))
+          (let [options+errors (-> options
+                                   (update ::unknown-options conj arg)
+                                   (assoc ::known-options (keys label->value-schemas)))]
+            (recur options+errors arguments rest-args)))
 
         (re-seq #"^-\S$" arg)
-        (let [[options rest-args] (parse-short-option (get label->value-schemas arg) options arg rest-args)]
-          (recur options arguments rest-args))
+        (if-let [value-schema (get label->value-schemas arg)]
+          (let [[options rest-args] (parse-short-option value-schema options arg rest-args)]
+            (recur options arguments rest-args))
+          (let [options+errors (-> options
+                                   (update ::unknown-options conj arg)
+                                   (assoc ::known-options (keys label->value-schemas)))]
+            (recur options+errors arguments rest-args)))
 
         (re-seq #"^-\S+$" arg)
         (let [interleaved-rest-args (break-short-option-group label->value-schemas arg rest-args)]

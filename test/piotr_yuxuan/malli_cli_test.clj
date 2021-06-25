@@ -242,6 +242,18 @@
             :async-parallelism 64,
             :create-market-dataset false}))))
 
+(deftest error-test
+  (let [cli-args ["--unknown-long-option" "--my-option" "VALUE" "-s"]]
+    (is (= (m/decode [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+                      [:my-option string?]]
+                     cli-args
+                     (mt/transformer malli-cli/cli-args-transformer))
+           {:piotr-yuxuan.malli-cli/unknown-options '("-s" "--unknown-long-option"),
+            :piotr-yuxuan.malli-cli/known-options '("--my-option"),
+            :my-option "VALUE",
+            :piotr-yuxuan.malli-cli/arguments [],
+            :piotr-yuxuan.malli-cli/cli-args cli-args}))))
+
 (deftest capability-test
   (is (= (m/decode
            [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
