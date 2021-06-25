@@ -178,6 +178,7 @@ See tests for minimal working code for each of these examples.
 ```
 
 - Grouped short flags like `-hal` are expanded like, for example:
+
 ``` clj
 {:help true
  :all true
@@ -191,6 +192,7 @@ See tests for minimal working code for each of these examples.
 ```
 
 - Non-idempotent options like `-vvv` are supported and may be rendered as:
+
 ``` clj
 {:verbosity 3}
 ;; or, depending on what you want:
@@ -268,4 +270,21 @@ See tests for minimal working code for each of these examples.
   -v  --log-level   :error
       --proxy-host  nil
       --proxy-port  nil
+```
+
+- Error handling with unknown options:
+
+``` clojure
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:my-option string?]]
+
+;; Example input:
+["--unknown-long-option" "--other-option" "VALUE" "-s"}
+
+;; Exemple output:
+#:piotr-yuxuan.malli-cli{:unknown-option-errors ({:arg "-s"} {:arg "--other-option"} {:arg "--unknown-long-option"}),
+                         :known-options ("--my-option"),
+                         :arguments ["VALUE"],
+                         :cli-args ["--unknown-long-option" "--other-option" "VALUE" "-s"]}
 ```
