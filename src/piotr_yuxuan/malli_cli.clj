@@ -115,18 +115,16 @@
   interpolate them with the tail of the arglist `rest-args` depending
   on the number of arguments each option needs. "
   [label->value-schemas arg rest-args]
-  (loop [[{:keys [short-option] :as value-schema} & ss] (->> (rest arg)
-                                                             (map #(str "-" %))
-                                                             (map label->value-schemas))
+  (loop [[{:keys [arg-number short-option] :as value-schema} & ss] (->> (rest arg)
+                                                                        (map #(str "-" %))
+                                                                        (map label->value-schemas))
          interpolated-args ()
          rest-args rest-args]
-    (let [arg-number (or (:short-option/arg-number value-schema)
-                         (:arg-number value-schema))]
-      (if (nil? value-schema)
-        (into rest-args interpolated-args)
-        (recur ss
-               (into (cons short-option interpolated-args) (take arg-number rest-args))
-               (drop arg-number rest-args))))))
+    (if (nil? value-schema)
+      (into rest-args interpolated-args)
+      (recur ss
+             (into (cons short-option interpolated-args) (take arg-number rest-args))
+             (drop arg-number rest-args)))))
 
 (defn break-long-option-and-value
   "Expand an argument that contains both an option label and a value
