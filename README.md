@@ -1,5 +1,7 @@
 # `piotr-yuxuan/malli-cli`
 
+[![](./doc/controller.jpg)]
+
 Command-line arguments with malli.
 
 [![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/malli-cli.svg)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
