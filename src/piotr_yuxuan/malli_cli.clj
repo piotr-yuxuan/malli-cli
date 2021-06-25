@@ -50,7 +50,7 @@
 (def default-arg-number
   1)
 
-(defn long-option->value-schema
+(defn ^MapEntry long-option->value-schema
   [default-label value-schema]
   (when-let [long-option (get value-schema
                               :long-option
@@ -64,7 +64,7 @@
                    (assoc :update-fn (or (:long-option/update-fn value-schema)
                                          (:update-fn value-schema)))))))
 
-(defn short-option->value-schema
+(defn ^MapEntry short-option->value-schema
   [default-label value-schema]
   (when-let [short-option (get value-schema
                                :short-option
