@@ -91,46 +91,55 @@
           (long-option->value-schema default-label value-schema')
           (short-option->value-schema default-label value-schema'))))
 
-(defn -parse-option
-  "Take the current arglist head `arg`, the tail `rest-args`. Depending
+(defrecord ParsingResult
+  [options argstail])
+
+(defn ^ParsingResult -parse-option
+  "Take the current arglist head `arg`, the tail args-tail`. Depending
   on the value schema consume some items from the tail and when
   applicable pass them on to `update-fn`. This is actually the core of
   the work that transforms a vector of string to a map of options."
-  [{:keys [in update-fn arg-number schema] :as value-schema} options arg rest-args]
-  (cond (and update-fn (not arg-number)) [(update options ::schema-errors conj {:message "update-fn needs arg-number", :arg arg, :schema schema})
-                                          rest-args]
-        (and update-fn arg-number) [(update-fn options value-schema (take arg-number rest-args))
-                                    (drop arg-number rest-args)]
-        (= 0 arg-number) [(assoc-in options in true)
-                          rest-args]
-        (= 1 arg-number) [(assoc-in options in (first rest-args))
-                          (rest rest-args)]
-        (number? arg-number) [(assoc-in options in (vec (take arg-number rest-args)))
-                              (drop arg-number rest-args)]
-        :generic-error [(update options ::schema-errors conj {:message "generic error", :arg arg, :schema schema})
-                        rest-args]))
+  [{:keys [in update-fn arg-number schema] :as value-schema} options arg argstail]
+  (cond (and update-fn (not arg-number)) (ParsingResult.
+                                           (update options ::schema-errors conj {:message "update-fn needs arg-number", :arg arg, :schema schema})
+                                           argstail)
+        (and update-fn arg-number) (ParsingResult.
+                                     (update-fn options value-schema (take arg-number argstail))
+                                     (drop arg-number argstail))
+        (= 0 arg-number) (ParsingResult.
+                           (assoc-in options in true)
+                           argstail)
+        (= 1 arg-number) (ParsingResult.
+                           (assoc-in options in (first argstail))
+                           (rest argstail))
+        (number? arg-number) (ParsingResult.
+                               (assoc-in options in (vec (take arg-number argstail)))
+                               (drop arg-number argstail))
+        :generic-error (ParsingResult.
+                         (update options ::schema-errors conj {:message "generic error", :arg arg, :schema schema})
+                         argstail)))
 
 (defn break-short-option-group
   "Expand a group of short option labels into a several short labels and
-  interpolate them with the tail of the arglist `rest-args` depending
+  interpolate them with the tail of the arglist args-tail` depending
   on the number of arguments each option needs. "
-  [label->value-schemas arg rest-args]
+  [label->value-schemas arg argstail]
   (loop [[{:keys [arg-number short-option] :as value-schema} & ss] (->> (rest arg)
                                                                         (map #(str "-" %))
                                                                         (map label->value-schemas))
          interpolated-args ()
-         rest-args rest-args]
+         argstail argstail]
     (if (nil? value-schema)
-      (into rest-args interpolated-args)
+      (into argstail interpolated-args)
       (recur ss
-             (into (cons short-option interpolated-args) (take arg-number rest-args))
-             (drop arg-number rest-args)))))
+             (into (cons short-option interpolated-args) (take arg-number argstail))
+             (drop arg-number argstail)))))
 
 (defn break-long-option-and-value
   "Expand an argument that contains both an option label and a value
   into two arguments: the label, and the value."
-  [arg rest-args]
-  (into (str/split arg #"=" 2) rest-args))
+  [arg argstail]
+  (into (str/split arg #"=" 2) argstail))
 
 (defn parse-args
   "Entry point to the technical work of turning a sequece of arguments
@@ -151,7 +160,7 @@
     ;; TODO Validate assumption on schema.
     (loop [options {}
            arguments []
-           [arg & rest-args] args]
+           [arg & argstail] args]
       (cond
         (nil? arg) ; Halting criterion
         (assoc options
@@ -160,36 +169,38 @@
 
         (= "--" arg)
         (recur options
-               (into arguments rest-args)
+               (into arguments argstail)
                [])
 
         (re-seq #"^--\S+=" arg)
-        (let [new-rest-args (break-long-option-and-value arg rest-args)]
+        (let [new-argstail (break-long-option-and-value arg argstail)]
           (recur options
                  arguments
-                 new-rest-args))
+                 new-argstail))
 
         (or (re-seq #"^--\S+$" arg)
             (re-seq #"^-\S$" arg))
         (if-let [value-schema (get label->value-schemas arg)]
-          (let [[options rest-args] (-parse-option value-schema options arg rest-args)]
-            (recur options arguments rest-args))
+          (let [parsing-result (-parse-option value-schema options arg argstail)]
+            (recur (.-options parsing-result)
+                   arguments
+                   (.-argstail parsing-result)))
           (recur (-> options
                      (update ::unknown-option-errors conj {:arg arg})
                      (assoc ::known-options (keys label->value-schemas)))
                  arguments
-                 rest-args))
+                 argstail))
 
         (re-seq #"^-\S+$" arg)
-        (let [interleaved-rest-args (break-short-option-group label->value-schemas arg rest-args)]
+        (let [interleaved-argstail (break-short-option-group label->value-schemas arg argstail)]
           (recur options
                  arguments
-                 interleaved-rest-args))
+                 interleaved-argstail))
 
         :application-argument
         (recur options
                (conj arguments arg)
-               rest-args)))))
+               argstail)))))
 
 (def cli-args-transformer
   "The malli transformer wrapping `parse-args`. To be used it with

@@ -67,28 +67,28 @@
                                     (mapcat malli-cli/label->value-schema)
                                     (into {}))
           options {:existing {:parsed "options"}}
-          [arg & rest-args] ["--my-long-option" "a" "--other-options" "and" "args"]
-          [options rest-args] (malli-cli/-parse-option (get label->value-schemas arg) options arg rest-args)]
+          [arg & argstail] ["--my-long-option" "a" "--other-options" "and" "args"]
+          {:keys [options argstail]} (malli-cli/-parse-option (get label->value-schemas arg) options arg argstail)]
       (is (= options {:existing {:parsed "options"}, :my-long-option "a"}))
-      (is (= rest-args '("--other-options" "and" "args")))))
+      (is (= argstail '("--other-options" "and" "args")))))
   (testing "nested option"
     (let [label->value-schemas (->> (malli-cli/value-schemas [:map [:my-long [:map [:nested-option int?]]]])
                                     (mapcat malli-cli/label->value-schema)
                                     (into {}))
           options {:existing {:parsed "options"}}
-          [arg & rest-args] ["--my-long-nested-option" 1 "--other-options" "and" "args"]
-          [options rest-args] (malli-cli/-parse-option (get label->value-schemas arg) options arg rest-args)]
+          [arg & argstail] ["--my-long-nested-option" 1 "--other-options" "and" "args"]
+          {:keys [options argstail]} (malli-cli/-parse-option (get label->value-schemas arg) options arg argstail)]
       (is (= options {:existing {:parsed "options"}, :my-long {:nested-option 1}}))
-      (is (= rest-args '("--other-options" "and" "args")))))
+      (is (= argstail '("--other-options" "and" "args")))))
   (testing "multiple arguments"
     (let [label->value-schemas (->> (malli-cli/value-schemas [:map [:my-option [string? {:arg-number 2}]]])
                                     (mapcat malli-cli/label->value-schema)
                                     (into {}))
           options {:existing {:parsed "options"}}
-          [arg & rest-args] ["--my-option" "a" "b" "--other-options" "and" "args"]
-          [options rest-args] (malli-cli/-parse-option (get label->value-schemas arg) options arg rest-args)]
+          [arg & argstail] ["--my-option" "a" "b" "--other-options" "and" "args"]
+          {:keys [options argstail]} (malli-cli/-parse-option (get label->value-schemas arg) options arg argstail)]
       (is (= options {:existing {:parsed "options"}, :my-option '("a" "b")}))
-      (is (= rest-args '("--other-options" "and" "args")))))
+      (is (= argstail '("--other-options" "and" "args")))))
   (testing "with update-fn"
     (testing "with multiple arguments"
       (let [label->value-schemas (->> (malli-cli/value-schemas [:map [:my-option [string? {:arg-number 2
@@ -97,20 +97,20 @@
                                       (mapcat malli-cli/label->value-schema)
                                       (into {}))
             options {:existing {:parsed "options"}}
-            [arg & rest-args] ["--my-option" "a" "b" "--other-options" "and" "args"]
-            [options rest-args] (malli-cli/-parse-option (get label->value-schemas arg) options arg rest-args)]
+            [arg & argstail] ["--my-option" "a" "b" "--other-options" "and" "args"]
+            {:keys [options argstail]} (malli-cli/-parse-option (get label->value-schemas arg) options arg argstail)]
         (is (= options {:existing {:parsed "options"}, :my-option ["b" "a"]}))
-        (is (= rest-args '("--other-options" "and" "args")))))
+        (is (= argstail '("--other-options" "and" "args")))))
     (testing "transforming the value in update-fn"
       (let [label->value-schemas (->> (malli-cli/value-schemas [:map [:my-option [string? {:update-fn (fn [options {:keys [path]} [cli-arg]]
                                                                                                         (assoc-in options path (str "grr-" cli-arg)))}]]])
                                       (mapcat malli-cli/label->value-schema)
                                       (into {}))
             options {:existing {:parsed "options"}}
-            [arg & rest-args] ["--my-option" "a" "--other-options" "and" "args"]
-            [options rest-args] (malli-cli/-parse-option (get label->value-schemas arg) options arg rest-args)]
+            [arg & argstail] ["--my-option" "a" "--other-options" "and" "args"]
+            {:keys [options argstail]} (malli-cli/-parse-option (get label->value-schemas arg) options arg argstail)]
         (is (= options {:existing {:parsed "options"}, :my-option "grr-a"}))
-        (is (= rest-args '("--other-options" "and" "args"))))
+        (is (= argstail '("--other-options" "and" "args"))))
       (testing "with short value"
         (let [label->value-schemas (->> (malli-cli/value-schemas [:map [:a [string? {:short-option "-a"
                                                                                      :update-fn (fn [options {:keys [path]} [cli-arg]]
@@ -118,10 +118,10 @@
                                         (mapcat malli-cli/label->value-schema)
                                         (into {}))
               options {:existing {:parsed "options"}}
-              [arg & rest-args] ["-a" "a" "--other-options" "and" "args"]
-              [options rest-args] (malli-cli/-parse-option (get label->value-schemas arg) options arg rest-args)]
+              [arg & argstail] ["-a" "a" "--other-options" "and" "args"]
+              {:keys [options argstail]} (malli-cli/-parse-option (get label->value-schemas arg) options arg argstail)]
           (is (= options {:existing {:parsed "options"}, :a "grr-a"}))
-          (is (= rest-args '("--other-options" "and" "args"))))))
+          (is (= argstail '("--other-options" "and" "args"))))))
     (testing "accumulating values"
       (let [label->value-schemas (->> (malli-cli/value-schemas [:map [:files [string? {:short-option "-f"
                                                                                        :long-option "--file"
@@ -131,15 +131,15 @@
                                       (into {}))]
         (testing "with long option"
           (let [options {:existing {:parsed "options"}}
-                [arg & rest-args] ["--file" "file://my-file" "--other-options" "and" "args"]
-                [options rest-args] (malli-cli/-parse-option (get label->value-schemas arg) options arg rest-args)]
+                [arg & argstail] ["--file" "file://my-file" "--other-options" "and" "args"]
+                {:keys [options argstail]} (malli-cli/-parse-option (get label->value-schemas arg) options arg argstail)]
             (is (= options {:existing {:parsed "options"}, :files '("file://my-file")}))
-            (is (= rest-args '("--other-options" "and" "args")))
+            (is (= argstail '("--other-options" "and" "args")))
             (testing "as well as with short options"
-              (let [[arg & rest-args] ["-f" "file://your-file" "--other-options" "and" "args"]
-                    [options rest-args] (malli-cli/-parse-option (get label->value-schemas arg) options arg rest-args)]
+              (let [[arg & argstail] ["-f" "file://your-file" "--other-options" "and" "args"]
+                    {:keys [options argstail]} (malli-cli/-parse-option (get label->value-schemas arg) options arg argstail)]
                 (is (= options {:existing {:parsed "options"}, :files '("file://your-file" "file://my-file")}))
-                (is (= rest-args '("--other-options" "and" "args")))))))))))
+                (is (= argstail '("--other-options" "and" "args")))))))))))
 
 (deftest break-short-option-group-test
   (testing "with no arguments"
@@ -149,10 +149,10 @@
                                                                                                     (update-in options path (fnil inc 0)))}]]])
                                     (mapcat malli-cli/label->value-schema)
                                     (into {}))
-          [arg & rest-args] ["-vvv" "--other-options" "and" "args"]]
+          [arg & argstail] ["-vvv" "--other-options" "and" "args"]]
       (is (= (malli-cli/break-short-option-group label->value-schemas
                                                  arg
-                                                 rest-args)
+                                                 argstail)
              '("-v" "-v" "-v" "--other-options" "and" "args")))))
   (testing "with one argument"
     (let [label->value-schemas (->> (malli-cli/value-schemas [:map [:files [string? {:short-option "-f"
@@ -160,10 +160,10 @@
                                                                                                   (update-in options path conj file))}]]])
                                     (mapcat malli-cli/label->value-schema)
                                     (into {}))
-          [arg & rest-args] ["-fff" "file://my-file" "file://your-file" "file://another-file" "--other-options" "and" "args"]]
+          [arg & argstail] ["-fff" "file://my-file" "file://your-file" "file://another-file" "--other-options" "and" "args"]]
       (is (= (malli-cli/break-short-option-group label->value-schemas
                                                  arg
-                                                 rest-args)
+                                                 argstail)
              '("-f" "file://my-file" "-f" "file://your-file" "-f" "file://another-file" "--other-options" "and" "args"))))))
 
 (def MyCliSchema
