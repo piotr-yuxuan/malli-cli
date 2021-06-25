@@ -100,24 +100,18 @@
   applicable pass them on to `update-fn`. This is actually the core of
   the work that transforms a vector of string to a map of options."
   [{:keys [in update-fn arg-number schema] :as value-schema} options arg argstail]
-  (cond (and update-fn (not arg-number)) (ParsingResult.
-                                           (update options ::schema-errors conj {:message "update-fn needs arg-number", :arg arg, :schema schema})
-                                           argstail)
-        (and update-fn arg-number) (ParsingResult.
-                                     (update-fn options value-schema (take arg-number argstail))
-                                     (drop arg-number argstail))
-        (= 0 arg-number) (ParsingResult.
-                           (assoc-in options in true)
-                           argstail)
-        (= 1 arg-number) (ParsingResult.
-                           (assoc-in options in (first argstail))
-                           (rest argstail))
-        (number? arg-number) (ParsingResult.
-                               (assoc-in options in (vec (take arg-number argstail)))
-                               (drop arg-number argstail))
-        :generic-error (ParsingResult.
-                         (update options ::schema-errors conj {:message "generic error", :arg arg, :schema schema})
-                         argstail)))
+  (cond (and update-fn (not arg-number)) (ParsingResult. (update options ::schema-errors conj {:message "update-fn needs arg-number", :arg arg, :schema schema})
+                                                         argstail)
+        (and update-fn arg-number) (ParsingResult. (update-fn options value-schema (take arg-number argstail))
+                                                   (drop arg-number argstail))
+        (= 0 arg-number) (ParsingResult. (assoc-in options in true)
+                                         argstail)
+        (= 1 arg-number) (ParsingResult. (assoc-in options in (first argstail))
+                                         (rest argstail))
+        (number? arg-number) (ParsingResult. (assoc-in options in (vec (take arg-number argstail)))
+                                             (drop arg-number argstail))
+        :generic-error (ParsingResult. (update options ::schema-errors conj {:message "generic error", :arg arg, :schema schema})
+                                       argstail)))
 
 (defn break-short-option-group
   "Expand a group of short option labels into a several short labels and
@@ -162,21 +156,9 @@
            arguments []
            [arg & argstail] args]
       (cond
-        (nil? arg) ; Halting criterion
-        (assoc options
-          ::arguments arguments
-          ::cli-args args)
-
-        (= "--" arg)
-        (recur options
-               (into arguments argstail)
-               [])
-
-        (re-seq #"^--\S+=" arg)
-        (let [new-argstail (break-long-option-and-value arg argstail)]
-          (recur options
-                 arguments
-                 new-argstail))
+        (nil? arg) (assoc options ::arguments arguments ::cli-args args)
+        (= "--" arg) (recur options (into arguments argstail) [])
+        (re-seq #"^--\S+=" arg) (recur options arguments (break-long-option-and-value arg argstail))
 
         (or (re-seq #"^--\S+$" arg)
             (re-seq #"^-\S$" arg))
@@ -191,16 +173,8 @@
                  arguments
                  argstail))
 
-        (re-seq #"^-\S+$" arg)
-        (let [interleaved-argstail (break-short-option-group label->value-schemas arg argstail)]
-          (recur options
-                 arguments
-                 interleaved-argstail))
-
-        :application-argument
-        (recur options
-               (conj arguments arg)
-               argstail)))))
+        (re-seq #"^-\S+$" arg) (recur options arguments (break-short-option-group label->value-schemas arg argstail))
+        :application-argument (recur options (conj arguments arg) argstail)))))
 
 (def cli-args-transformer
   "The malli transformer wrapping `parse-args`. To be used it with
