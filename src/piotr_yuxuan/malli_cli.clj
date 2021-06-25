@@ -96,9 +96,9 @@
   on the value schema consume some items from the tail and when
   applicable pass them on to `update-fn`. This is actually the core of
   the work that transforms a vector of string to a map of options."
-  [{:keys [in update-fn arg-number] :as value-schema} options arg rest-args]
-  (cond (not value-schema) [(update options ::invalid conj arg)
-                            rest-args]
+  [{:keys [in update-fn arg-number schema] :as value-schema} options arg rest-args]
+  (cond (and update-fn (not arg-number)) [(update options ::schema-errors conj {:message "update-fn needs arg-number", :arg arg, :schema schema})
+                                          rest-args]
         (and update-fn arg-number) [(update-fn options value-schema (take arg-number rest-args))
                                     (drop arg-number rest-args)]
         (= 0 arg-number) [(assoc-in options in true)
@@ -106,7 +106,9 @@
         (= 1 arg-number) [(assoc-in options in (first rest-args))
                           (rest rest-args)]
         (number? arg-number) [(assoc-in options in (vec (take arg-number rest-args)))
-                              (drop arg-number rest-args)]))
+                              (drop arg-number rest-args)]
+        :generic-error [(update options ::schema-errors conj {:message "generic error", :arg arg, :schema schema})
+                        rest-args]))
 
 (defn break-short-option-group
   "Expand a group of short option labels into a several short labels and
@@ -175,7 +177,7 @@
           (let [[options rest-args] (-parse-option value-schema options arg rest-args)]
             (recur options arguments rest-args))
           (recur (-> options
-                     (update ::unknown-options conj arg)
+                     (update ::unknown-option-errors conj {:arg arg})
                      (assoc ::known-options (keys label->value-schemas)))
                  arguments
                  rest-args))

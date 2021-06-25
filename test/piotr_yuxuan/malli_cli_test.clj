@@ -248,7 +248,7 @@
                       [:my-option string?]]
                      cli-args
                      (mt/transformer malli-cli/cli-args-transformer))
-           {:piotr-yuxuan.malli-cli/unknown-options '("-s" "--unknown-long-option"),
+           {:piotr-yuxuan.malli-cli/unknown-option-errors '({:arg "-s"} {:arg "--unknown-long-option"}),
             :piotr-yuxuan.malli-cli/known-options '("--my-option"),
             :my-option "VALUE",
             :piotr-yuxuan.malli-cli/arguments [],
