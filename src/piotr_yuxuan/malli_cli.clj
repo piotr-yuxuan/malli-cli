@@ -58,11 +58,11 @@
                                 (str "--" default-label)))]
     (MapEntry. long-option
                (-> (remove-key (comp #{"long-option" "short-option"} namespace) value-schema)
-                   (assoc :arg-number (get (:long-option/arg-number value-schema)
-                                           (:arg-number value-schema)
-                                           default-arg-number))
-                   (assoc :update-fn (get (:long-option/update-fn value-schema)
-                                          (:update-fn value-schema)))))))
+                   (assoc :arg-number (or (:long-option/arg-number value-schema)
+                                          (:arg-number value-schema)
+                                          default-arg-number))
+                   (assoc :update-fn (or (:long-option/update-fn value-schema)
+                                         (:update-fn value-schema)))))))
 
 (defn short-option->value-schema
   [default-label value-schema]
@@ -72,11 +72,11 @@
                                  (str "-" default-label)))]
     (MapEntry. short-option
                (-> (remove-key (comp #{"long-option" "short-option"} namespace) value-schema)
-                   (assoc :arg-number (get (:short-option/arg-number value-schema)
-                                           (:arg-number value-schema)
-                                           default-arg-number))
-                   (assoc :update-fn (get (:short-option/update-fn value-schema)
-                                          (:update-fn value-schema)))))))
+                   (assoc :arg-number (or (:short-option/arg-number value-schema)
+                                          (:arg-number value-schema)
+                                          default-arg-number))
+                   (assoc :update-fn (or (:short-option/update-fn value-schema)
+                                         (:update-fn value-schema)))))))
 
 (defn label->value-schema
   "Return `MapEntry` items, when applicable one for short, and long
