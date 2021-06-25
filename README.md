@@ -35,18 +35,30 @@ See tests for minimal working code for each of these examples.
 
 ``` clj
 {:long-option "VALUE"}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+  [:long-option string?]]
 ```
 
 - Grouped flag and value with `--long-option=VALUE` may give
 
 ``` clj
 {:long-option "VALUE"}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+  [:long-option string?]]
 ```
 
 - Short option names with `-s VALUE` may give
 
 ``` clj
 {:some-option "VALUE"}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:some-option [string? {:short-option "-s"}]]]
 ```
 
 - Options that accept a variable number of arguments: `-a -b val0 --c
@@ -56,6 +68,12 @@ See tests for minimal working code for each of these examples.
 {:option-a true
  :option-b "val0"
  :option-c ["val1" "val2"]}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:a [boolean? {:arg-number 0}]]
+ [:b string?]
+ [:c [string? {:arg-number 2}]]]
 ```
 
 - Non-option arguments are supported directly amongst options, or
@@ -63,9 +81,14 @@ See tests for minimal working code for each of these examples.
   equivalent to:
 
 ``` clj
-{:option-a 1
- :option-b 2
+{:a 1
+ :b 2
  :piotr-yuxuan.malli-cli/arguments ["ARG0" "ARG1" "ARG2"]}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:a [boolean? {:arg-number 0}]]
+ [:b string?]]
 ```
 
 - Grouped short flags like `-hal` are expanded like, for example:
@@ -73,6 +96,12 @@ See tests for minimal working code for each of these examples.
 {:help true
  :all true
  :list true}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:help [boolean? {:short-option "-h" :arg-number 0}]]
+ [:all [boolean? {:short-option "-a" :arg-number 0}]]
+ [:list [boolean? {:short-option "-l" :arg-number 0}]]]
 ```
 
 - Non-idempotent options like `-vvv` are supported and may be rendered as:
@@ -80,6 +109,24 @@ See tests for minimal working code for each of these examples.
 {:verbosity 3}
 ;; or, depending on what you want:
 {:log-level :debug}
+
+;; Example schemas:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:log-level [:and
+              keyword?
+              [:enum {:short-option "-v"
+                      :short-option/arg-number 0
+                      :short-option/update-fn (fn [options {:keys [in schema]} _cli-args]
+                                                (update-in options in (malli-cli/children-successor schema)))
+                      :default :error}
+               :off :fatal :error :warn :info :debug :trace :all]]]]
+
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:verbosity [int? {:short-option "-v"
+                    :short-option/arg-number 0
+                    :short-option/update-fn (fn [options {:keys [in]} _cli-args]
+                                              (update-in options in (fnil inc 0)))
+                    :default 0}]]]
 ```
 
 - You may use nested maps in your config schema so that `--proxy-host
@@ -88,6 +135,12 @@ See tests for minimal working code for each of these examples.
 ``` clj
 {:proxy {:host "https://example.org/upload"
          :port 3447}}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:proxy [:map
+          [:host string?]
+          [:port pos-int?]]]]
 ```
 
 - Namespaced keyword are allowed, albeit the command-line option name
@@ -95,6 +148,10 @@ See tests for minimal working code for each of these examples.
 
 ```clj
 {:upload/parallelism 32}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:upload/parallelism pos-int?]]
 ```
 
 - You can provide your own code to update the result map with some
@@ -104,6 +161,17 @@ See tests for minimal working code for each of these examples.
 {:vanity-name ">> Piotr <<"
  :original-name "Piotr"
  :first-letter \P}
+
+;; Example schema:
+[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+ [:vanity-name [string? {:long-option "--name"
+                         :update-fn (fn [options {:keys [in]} [username]]
+                                      (-> options
+                                          (assoc :vanity-name (format ">> %s <<" username))
+                                          (assoc :original-name username)
+                                          (assoc :first-letter (first username))))}]]
+ [:original-name string?]
+ [:first-letter char?]]
 ```
 
 # Simple example
