@@ -65,9 +65,9 @@ See tests for minimal working code for each of these examples.
   val1 val2`
 
 ``` clj
-{:option-a true
- :option-b "val0"
- :option-c ["val1" "val2"]}
+{:a true
+ :b "val0"
+ :c ["val1" "val2"]}
 
 ;; Example schema:
 [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
