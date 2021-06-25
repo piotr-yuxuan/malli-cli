@@ -180,7 +180,8 @@
                           :short-option/arg-number 0
                           :short-option/update-fn (fn [options {:keys [in schema]} _cli-args]
                                                     (update-in options in (malli-cli/children-successor schema)))
-                          :default :info}
+                          :default :info
+                          :summary-path [:log-level]}
                    :off :fatal :error :warn :info :debug :trace :all]]]
      [:upload-api [string?
                    {:short-option "-a"
@@ -195,7 +196,7 @@
                         :update-fn (fn [options {:keys [in]} [market]]
                                      (update-in options in conj market))
                         :default :FRANCE
-                        :description "Must be the string representation of a market code as from Viooh data model."}
+                        :summary-path [:markets]}
                  :FRANCE :UNITED_KINGDOM]]]
      [:upload/data [:map
                     [:format string?]
@@ -206,6 +207,7 @@
      [:async-parallelism [pos-int? {:default 64
                                     :description "Parallelism factor for `core.async`."}]]
      [:create-market-dataset [boolean? {:default false
+                                        :summary "Create the dataset."
                                         :description "If true, needs `--database` to be set. It will create the dataset. Canary test will be performed after the version is published, because database needs at least one version to have been published before it can respond."}]]]))
 
 (deftest cli-args-transformer-test
@@ -366,3 +368,15 @@
          {:vanity-name ">> Piotr <<"
           :original-name "Piotr"
           :first-letter \P})))
+
+(deftest simple-summary-test
+  (is (=  (malli-cli/simple-summary MyCliSchema)
+         "  -h  --help                   false
+  -a  --upload-api             \"http://localhost:8080\"  Address of target upload-api instance.
+      --database               \"http://localhost:8888\"  Address of database instance behind upload-api.
+      --upload-data-format     nil
+      --upload-data-file       nil
+      --proxy-host             nil
+      --proxy-port             nil
+      --async-parallelism      64                       Parallelism factor for `core.async`.
+      --create-market-dataset  false                    Create the dataset.")))

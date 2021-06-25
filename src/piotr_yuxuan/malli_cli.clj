@@ -197,3 +197,49 @@
     mt/strip-extra-keys-transformer
     mt/default-value-transformer
     mt/string-transformer))
+
+(defn start-with?
+  [prefix path]
+  (every? true? (map = prefix path)))
+
+(defn prefix-shadowing
+  [value-schemas]
+  (loop [[{:keys [schema] :as head} & tail] value-schemas
+         known-prefix? #{}
+         remainder value-schemas]
+    (let [prefix (some-> schema m/properties :summary-path)]
+      (cond (nil? head) remainder
+            (and prefix (known-prefix? prefix)) (recur tail known-prefix? remainder)
+            prefix (recur tail
+                          (conj known-prefix? prefix)
+                          (remove (comp (partial start-with? prefix) :path) remainder))
+            :else (recur tail known-prefix? remainder)))))
+
+(defn -make-format
+  ;; From clojure/tools.cli
+  "Given a sequence of column widths, return a string suitable for use in
+  format to print a sequences of strings in those columns."
+  [lens]
+  (str/join (map #(str "  %" (when-not (zero? %) (str "-" %)) "s") lens)))
+
+(defn simple-summary
+  [schema]
+  (let [short-option-name (comp first second)
+        long-option-name (comp first first)
+        default-value (comp pr-str :default second first)
+        description (comp #(->> % :description (:summary %)) second first)
+        summary-table (->> (value-schemas schema)
+                           prefix-shadowing
+                           (map label+value-schema)
+                           ;; All through `str` so that nil is rendered as empty string.
+                           (map (juxt (comp str short-option-name)
+                                      (comp str long-option-name)
+                                      (comp str default-value)
+                                      (comp str description))))
+        max-column-widths (reduce (fn [acc row] (map (partial max) (map count row) acc))
+                                  (repeat 0)
+                                  summary-table)]
+    (str/join "\n" (map (fn [v]
+                          (let [fmt (-make-format max-column-widths)]
+                            (.stripTrailing ^String (apply format fmt v))))
+                        summary-table))))

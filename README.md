@@ -174,6 +174,16 @@ See tests for minimal working code for each of these examples.
  [:first-letter char?]]
 ```
 
+- Build a simple summary string (see schema below):
+
+``` txt
+  -h  --help        nil
+  -a  --upload-api  "http://localhost:8080"  Address of target upload-api instance.
+  -v  --log-level   :error
+      --proxy-host  nil
+      --proxy-port  nil
+```
+
 # Simple example
 
 Let's consider this config schema:
