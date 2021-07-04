@@ -25,6 +25,19 @@ workflow:
 - If the resulting value conforms to what you expect (schema
   validation) you may finally use it with confidence.
 
+# Maturity and evolution
+
+The API can be expected to change as we're still in version
+`0.0.x`. However, given the examples below, one would say that it
+covers all of the use cases one could think about regarding
+command-line arguments.
+
+However, a command-line interface is not restricted to arguments but
+should also gracefully handle environement variables. It is currently
+possible (see example below) but it could probably be made much
+simpler and straightforward. Please your input on this if you have any
+🙂!
+
 # Simple example
 
 Let's consider this config schema:
