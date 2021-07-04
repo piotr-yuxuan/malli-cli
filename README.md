@@ -27,6 +27,9 @@ workflow:
 
 # Maturity and evolution
 
+> TL;DR: account for some changes ahead, but it is usable as is and
+> should probably match your use case.
+
 The API can be expected to change as we're still in version
 `0.0.x`. However, given the examples below, one would say that it
 covers all of the use cases one could think about regarding
