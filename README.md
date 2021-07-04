@@ -290,3 +290,54 @@ See tests for minimal working code for each of these examples.
                          :arguments ["VALUE"],
                          :cli-args ["--unknown-long-option" "--other-option" "VALUE" "-s"]}
 ```
+
+- Handle environment variables (good enough for now but subject to
+  further API change):
+
+``` clojure
+;; Example schema.
+(def Config
+  [:map
+   [:options
+    [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+     [:commands [:vector {:long-option "--command"
+                          :update-fn (fn [options {:keys [in]} [command]]
+                                       (update-in options in (fnil conj []) command))}
+                 keyword?]]]]
+   [:env
+    [:map
+     [:user string?]
+     [:pwd string?]]]])
+
+;; Example code. To keep it straightforward, config here only comes
+;; from malli-cli. The `:env` map will be stripped of extra keys by the
+;; transformer.
+(require '[camel-snake-kebab.core :as csk])
+(defn load-config
+  [env args]
+  (m/decode Config
+            {:options args
+             :env (into {} env)}
+            (mt/transformer
+              (mt/key-transformer {:decode csk/->kebab-case-keyword})
+              malli-cli/cli-args-transformer
+              mt/strip-extra-keys-transformer
+              mt/default-value-transformer
+              mt/string-transformer)))
+
+;; Example usage:
+(load-config
+  (System/getenv)
+  ["--command" "init-db" "--command" "conform-repo"])
+;; => {:options {:commands [:init-db :conform-repo]},
+       :env {:pwd "~",
+             :user "piotr-yuxuan"}}
+
+;; Another example usage, showing config validation:
+(let [config (load-config
+               (System/getenv)
+               args)]
+  (when-not (m/validate Config config)
+    (pp/pprint (m/explain m/validate Config config))
+    (System/exit 1)))
+```
