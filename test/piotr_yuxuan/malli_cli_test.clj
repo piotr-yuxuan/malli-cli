@@ -370,7 +370,7 @@
           :first-letter \P})))
 
 (deftest simple-summary-test
-  (is (=  (malli-cli/simple-summary MyCliSchema)
+  (is (= (malli-cli/simple-summary MyCliSchema)
          "  -h  --help                   false
   -a  --upload-api             \"http://localhost:8080\"  Address of target upload-api instance.
       --database               \"http://localhost:8888\"  Address of database instance behind upload-api.
