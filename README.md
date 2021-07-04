@@ -1,6 +1,6 @@
 # `piotr-yuxuan/malli-cli`
 
-[![](./doc/controller.jpg)]
+![](./doc/controller.jpg)
 
 Command-line arguments with malli.
 
