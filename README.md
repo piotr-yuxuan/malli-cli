@@ -9,6 +9,9 @@ Command-line arguments with malli.
 [![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
 
+You may also be interested in https://github.com/l3nz/cli-matic which
+is more established.
+
 # What it offers
 
 This library provides out-of-the-box cli parsing. It exposes a
