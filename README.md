@@ -332,6 +332,7 @@ See tests for minimal working code for each of these examples.
 ;; from malli-cli. The `:env` map will be stripped of extra keys by the
 ;; transformer.
 (require '[camel-snake-kebab.core :as csk])
+(require '[malli.transform :as mt])
 (defn load-config
   [env args]
   (m/decode Config
@@ -348,9 +349,11 @@ See tests for minimal working code for each of these examples.
 (load-config
   (System/getenv)
   ["--command" "init-db" "--command" "conform-repo"])
-;; => {:options {:commands [:init-db :conform-repo]},
-       :env {:pwd "~",
-             :user "piotr-yuxuan"}}
+;; =>
+  #_
+  {:options {:commands [:init-db :conform-repo]},
+   :env {:pwd "~",
+         :user "piotr-yuxuan"}}
 
 ;; Another example usage, showing config validation:
 (let [config (load-config
