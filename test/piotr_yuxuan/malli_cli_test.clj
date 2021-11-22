@@ -212,7 +212,7 @@
 
 (deftest cli-args-transformer-test
   (is (= (m/decode MyCliSchema [] (mt/transformer malli-cli/cli-args-transformer))
-         #:piotr-yuxuan.malli-cli{:arguments [], :cli-args []}))
+         #:piotr-yuxuan.malli-cli{:operands [], :cli-args []}))
   (let [cli-args ["-vvv" "--upload-api" "http://localhost:8080" "--market" "FRANCE" "--market=UNITED_KINGDOM" "random-arg" "--upload-data-file" "samples/primary.edn" "--upload-data-format" "line-edn" "--proxy-host" "localhost" "--proxy-port" "8081" "--" "little" "weasel"]]
     (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-args-transformer))
            {:log-level :all,
@@ -220,7 +220,7 @@
             :markets '("UNITED_KINGDOM" "FRANCE"),
             :upload/data {:file "samples/primary.edn", :format "line-edn"},
             :proxy {:host "localhost", :port "8081"},
-            :piotr-yuxuan.malli-cli/arguments ["random-arg" "little" "weasel"],
+            ::malli-cli/operands ["random-arg" "little" "weasel"],
             :piotr-yuxuan.malli-cli/cli-args cli-args})))
   (let [cli-args ["-v" "--upload-api" "http://localhost:8080" "--market" "FRANCE" "--market=UNITED_KINGDOM" "random-arg" "--upload-data-file" "samples/primary.edn" "--upload-data-format" "line-edn" "--proxy-host" "localhost" "--proxy-port" "8081" "--" "little" "weasel"]]
     (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-args-transformer))
@@ -229,13 +229,13 @@
             :markets '("UNITED_KINGDOM" "FRANCE"),
             :upload/data {:file "samples/primary.edn", :format "line-edn"},
             :proxy {:host "localhost", :port "8081"},
-            :piotr-yuxuan.malli-cli/arguments ["random-arg" "little" "weasel"],
+            ::malli-cli/operands ["random-arg" "little" "weasel"],
             :piotr-yuxuan.malli-cli/cli-args cli-args})))
   (is (= (m/decode MyCliSchema ["--help"] (mt/transformer malli-cli/cli-args-transformer))
-         {:help true, :piotr-yuxuan.malli-cli/arguments [], :piotr-yuxuan.malli-cli/cli-args ["--help"]}))
+         {:help true, ::malli-cli/operands [], :piotr-yuxuan.malli-cli/cli-args ["--help"]}))
   (let [cli-args ["--log-level" "all"]]
     (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-args-transformer))
-           {:log-level "all", :piotr-yuxuan.malli-cli/arguments [], :piotr-yuxuan.malli-cli/cli-args ["--log-level" "all"]}))
+           {:log-level "all", ::malli-cli/operands [], :piotr-yuxuan.malli-cli/cli-args ["--log-level" "all"]}))
     (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/simple-cli-options-transformer))
            {:log-level :all,
             :help false,
@@ -253,7 +253,7 @@
            {:piotr-yuxuan.malli-cli/unknown-option-errors '({:arg "-s"} {:arg "--unknown-long-option"}),
             :piotr-yuxuan.malli-cli/known-options '("--my-option"),
             :my-option "VALUE",
-            :piotr-yuxuan.malli-cli/arguments [],
+            ::malli-cli/operands [],
             :piotr-yuxuan.malli-cli/cli-args cli-args}))))
 
 (deftest capability-test
@@ -297,7 +297,7 @@
            (mt/transformer malli-cli/cli-args-transformer))
          {:a true,
           :b "2",
-          ::malli-cli/arguments ["1" "ARG0" "ARG1" "ARG2"],
+          ::malli-cli/operands ["1" "ARG0" "ARG1" "ARG2"],
           ::malli-cli/cli-args ["-a" "1" "ARG0" "-b" "2" "--" "ARG1" "ARG2"]}))
 
   (is (= (m/decode
@@ -319,6 +319,17 @@
                                  :short-option/arg-number 0
                                  :short-option/update-fn (fn [options {:keys [in schema]} _cli-args]
                                                            (update-in options in (malli-cli/children-successor schema)))
+                                 :default :error}
+                          :off :fatal :error :warn :info :debug :trace :all]]]]
+           ["-vvv"]
+           (mt/transformer malli-cli/simple-cli-options-transformer))
+         (m/decode
+           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+            [:log-level [:and
+                         keyword?
+                         [:enum {:short-option "-v"
+                                 :short-option/arg-number 0
+                                 :short-option/update-fn malli-cli/non-idempotent-option
                                  :default :error}
                           :off :fatal :error :warn :info :debug :trace :all]]]]
            ["-vvv"]
@@ -371,12 +382,13 @@
 
 (deftest simple-summary-test
   (is (= (malli-cli/simple-summary MyCliSchema)
-         "  -h  --help                   false
-  -a  --upload-api             \"http://localhost:8080\"  Address of target upload-api instance.
-      --database               \"http://localhost:8888\"  Address of database instance behind upload-api.
-      --upload-data-format     nil
-      --upload-data-file       nil
-      --proxy-host             nil
-      --proxy-port             nil
-      --async-parallelism      64                       Parallelism factor for `core.async`.
-      --create-market-dataset  false                    Create the dataset.")))
+         "  Short  Long option              Default                  Description
+  -h     --help                   false
+  -a     --upload-api             \"http://localhost:8080\"  Address of target upload-api instance.
+         --database               \"http://localhost:8888\"  Address of database instance behind upload-api.
+         --upload-data-format
+         --upload-data-file
+         --proxy-host
+         --proxy-port
+         --async-parallelism      64                       Parallelism factor for `core.async`.
+         --create-market-dataset  false                    Create the dataset.")))

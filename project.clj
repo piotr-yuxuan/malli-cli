@@ -10,7 +10,6 @@
                               [:name "胡雨軒 Петр"]
                               [:url "https://github.com/piotr-yuxuan"]]]
   :dependencies []
-  :aot :all
   :profiles {:github {:github/topics ["map" "clojure" "state-management" "component"
                                       "state" "mount" "integrant" "closeable" "deps-edn"
                                       "tools-cli" "with-open" "clojure-maps"]}

@@ -1,5 +1,7 @@
 (ns piotr-yuxuan.malli-cli
-  (:require [clojure.data]
+  (:require [piotr-yuxuan.domain.posix :as posix]
+            [piotr-yuxuan.domain.gnu :as gnu]
+            [clojure.data]
             [clojure.string :as str]
             [malli.core :as m]
             [malli.transform :as mt]
@@ -7,14 +9,16 @@
   (:import (clojure.lang MapEntry)))
 
 (defn children-successor
-  "Given a schema `[:enum :a :b :c :d]`, return a Clojure map that
-  return the next item of :a -> :b -> :c -> :d <-> :d. The last item
-  is mapped onto itself. If the schema has a default value as a
-  property, like in `[:enum {:default :b} :a :b :c :d]` an additional
-  mapping will be made nil -> :c.
+  "Given a schema `[:enum :a :b :c :d]`, return a Clojure map (that is,
+  a queryable data structure) that returns the next item of
+  :a -> :b -> :c -> :d <-> :d. The last item is mapped onto itself. If
+  the schema has a default value as a property, like in
+  `[:enum {:default :b} :a :b :c :d]` an additional mapping will be
+  made nil -> :c.
 
-  Primarily intended to be used on enum schema, but code is generic so
-  you might think of a use case on another schema type."
+  Primarily intended to be used on enum schema for non-idempotent
+  options (like :verbose), but code is generic so you might think of a
+  use case on another schema type."
   [schema]
   (let [properties (m/properties schema)
         children (m/children schema)
@@ -26,6 +30,10 @@
       ;; have to handle it manually.
       (contains? properties :default) (as-> $ (assoc $ nil (get $ (:default properties))))
       :loop-on-last (assoc last-child last-child))))
+
+(def non-idempotent-option
+  (fn [options {:keys [in schema]} _cli-args]
+    (update-in options in (children-successor schema))))
 
 (defn name-items
   "Take an argument and return a vector of items that will form an
@@ -52,10 +60,9 @@
 
 (defn ^MapEntry long-option->value-schema
   [default-label value-schema]
-  (when-let [long-option (get value-schema
-                              :long-option
-                              (when (< 1 (count default-label))
-                                (str "--" default-label)))]
+  (when-let [long-option (:long-option value-schema (when (< 1 (count default-label))
+                                                      ;; Character ? is reserved in shell
+                                                      (str "--" (str/replace default-label #"\?$" ""))))]
     (MapEntry. long-option
                (-> (remove-key (comp #{"long-option" "short-option"} namespace) value-schema)
                    (assoc :arg-number (or (:long-option/arg-number value-schema)
@@ -135,45 +142,61 @@
   (into (str/split arg #"=" 2) argstail))
 
 (defn parse-args
-  "Entry point to the technical work of turning a sequece of arguments
+  "Entry point to the technical work of turning a sequence of arguments
   `args` into a map that (maybe) conforms to a `schema`. It returns a
   map of the options as parsed according to the schema, but with two
   additional keys:
 
-  - `::arguments` is a vector of application arguments, that is to say
+  - `::operands` is a vector of application arguments, that is to say
     command-line arguments that do not represent an option value.
 
   - `::cli-args` is the raw, untouched vector of command-line
     arguments received as input. Perhaps you need it for some
     additional validation of positional logic."
-  [schema args]
-  (let [label+value-schemas (->> (value-schemas schema)
-                                 (mapcat label+value-schema)
-                                 (into {}))]
-    ;; TODO Validate assumption on schema.
-    (loop [options {}
-           arguments []
-           [arg & argstail] args]
-      (cond
-        (nil? arg) (assoc options ::arguments arguments ::cli-args args)
-        (= "--" arg) (recur options (into arguments argstail) [])
-        (re-seq #"^--\S+=" arg) (recur options arguments (break-long-option-and-value arg argstail))
+  [label+value-schemas args]
+  ;; TODO Validate assumption on schema.
+  (loop [options {}
+         operands []
+         [arg & argstail] args]
+    (cond
+      (nil? arg) ; Argument list to parse is exhausted
+      (assoc options
+        ::operands operands
+        ::cli-args args)
 
-        (or (re-seq #"^--\S+$" arg)
-            (re-seq #"^-\S$" arg))
-        (if-let [value-schema (get label+value-schemas arg)]
-          (let [parsing-result (-parse-option value-schema options arg argstail)]
-            (recur (.-options parsing-result)
-                   arguments
-                   (.-argstail parsing-result)))
-          (recur (-> options
-                     (update ::unknown-option-errors conj {:arg arg})
-                     (assoc ::known-options (keys label+value-schemas)))
-                 arguments
-                 argstail))
+      (= posix/option-terminator arg)
+      (recur options (into operands argstail) [])
 
-        (re-seq #"^-\S+$" arg) (recur options arguments (break-short-option-group label+value-schemas arg argstail))
-        :application-argument (recur options (conj arguments arg) argstail)))))
+      (gnu/long-option-with-value? arg)
+      (recur options
+             operands
+             (break-long-option-and-value arg argstail))
+
+      (and (get label+value-schemas arg)
+           (or (gnu/long-option-without-value? arg)
+               (posix/single-option-without-value? arg)))
+      (let [parsing-result (-parse-option (get label+value-schemas arg) options arg argstail)]
+        (recur (.-options parsing-result)
+               operands
+               (.-argstail parsing-result)))
+
+      (or (gnu/long-option-without-value? arg)
+          (posix/single-option-without-value? arg))
+      (recur (-> options
+                 (update ::unknown-option-errors conj {:arg arg})
+                 (assoc ::known-options (keys label+value-schemas)))
+             operands
+             argstail)
+
+      (posix/grouped-options? arg)
+      (recur options
+             operands
+             (break-short-option-group label+value-schemas arg argstail))
+
+      :operand
+      (recur options
+             (conj operands arg)
+             argstail))))
 
 (def cli-args-transformer
   "The malli transformer wrapping `parse-args`. To be used it with
@@ -183,8 +206,12 @@
   parsing. See `simple-cli-options-transformer` for an example."
   {:name :cli-args-transformer
    :compile (fn [schema _]
-              (fn [args]
-                (parse-args schema args)))})
+              (let [label+value-schemas (->> (value-schemas schema)
+                                             (mapcat label+value-schema)
+                                             (into {}))]
+                (fn [args]
+                  (parse-args label+value-schemas
+                              args))))})
 
 (def simple-cli-options-transformer
   "Simple transformer for the most common use cases when you only want
@@ -199,6 +226,8 @@
     mt/string-transformer))
 
 (defn start-with?
+  "Return true if the collection `path` starts with all the items of
+  collection `prefix`."
   [prefix path]
   (every? true? (map = prefix path)))
 
@@ -222,11 +251,20 @@
   [lens]
   (str/join (map #(str "  %" (when-not (zero? %) (str "-" %)) "s") lens)))
 
+(def simple-summary-header
+  ["Short" "Long option" "Default" "Description"])
+
+(defn default-value
+  [value-schema]
+  (let [default->str (or (-> value-schema first second :default->str)
+                         (fn [x] (when-not (nil? x) (pr-str x))))
+        default (-> value-schema first second :default)]
+    (default->str default)))
+
 (defn simple-summary
   [schema]
   (let [short-option-name (comp first second)
         long-option-name (comp first first)
-        default-value (comp pr-str :default second first)
         description (comp #(->> % :description (:summary %)) second first)
         summary-table (->> (value-schemas schema)
                            prefix-shadowing
@@ -235,7 +273,8 @@
                            (map (juxt (comp str short-option-name)
                                       (comp str long-option-name)
                                       (comp str default-value)
-                                      (comp str description))))
+                                      (comp str description)))
+                           (cons simple-summary-header))
         max-column-widths (reduce (fn [acc row] (map (partial max) (map count row) acc))
                                   (repeat 0)
                                   summary-table)]
@@ -243,3 +282,20 @@
                           (let [fmt (-make-format max-column-widths)]
                             (.stripTrailing ^String (apply format fmt v))))
                         summary-table))))
+
+(defn deep-merge
+  "It merges maps recursively. It merges the maps from left
+  to right and the right-most value wins. It is useful to merge the
+  user defined configuration on top of the default configuration.
+  example:
+  ``` clojure
+  (deep-merge {:foo 1 :bar {:baz 2}}
+              {:foo 2 :bar {:baz 1 :qux 3}})
+  ;;=> {:foo 2, :bar {:baz 1, :qux 3}}
+  ```
+  From https://github.com/BrunoBonacci/1config"
+  [& maps]
+  (let [maps (filter (comp not nil?) maps)]
+    (if (every? map? maps)
+      (apply merge-with deep-merge maps)
+      (last maps))))

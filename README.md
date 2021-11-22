@@ -2,7 +2,7 @@
 
 ![](./doc/controller.jpg)
 
-Command-line arguments with malli.
+Command-line interface with malli.
 
 [![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/malli-cli.svg)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
 [![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/malli-cli)](https://cljdoc.org/d/com.github.piotr-yuxuan/malli-cli/CURRENT)
@@ -20,13 +20,32 @@ map that can later be merged with the config. As such it intends to
 play nicely with configuration tools, so you may have the following
 workflow:
 
-- Retrieve value from some configuration management system ;
+- Retrieve value from some configuration management system;
 - Consider command line arguments as configuration ad-hoc overrides,
   tokenise them and structure them into a map of command-line options;
 - Merge the two partial values above and fill the blank with default
   values;
 - If the resulting value conforms to what you expect (schema
   validation) you may finally use it with confidence.
+
+# Standards
+
+``` txt
+utility_name [-a][-b][-c option_argument]
+             [-d|-e][-f[option_argument]][operand...]
+```
+
+The utility in the example is named `utility_name`. It is followed by
+options, option-arguments, and operands. The arguments that consist of
+`-` characters and single letters or digits, such as `a`, are known as
+"options" (or, historically, "flags"). Certain options are followed by
+an "option-argument", as shown with `[ -c option_argument]`. The
+arguments following the last options and option-arguments are named
+"operands".
+
+Any differences from the standards is considered a bug.
+- [GNU Program Argument Syntax Conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html)
+- [POSIX.1-2017 Utility argument syntax](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html)"
 
 # Maturity and evolution
 
@@ -54,27 +73,40 @@ Let's consider this config schema:
 
 (def Config
   (m/schema
-    [:map {:closed true}
+    [:map {:closed true, :decode/cli-args-transformer malli-cli/cli-args-transformer}
+     [:show-config? [boolean? {:optional true
+                               :arg-number 0}]]
      [:help [boolean? {:short-option "-h"
                        :optional true
                        :arg-number 0}]]
-     [:upload-api [string?
-                   {:short-option "-a"
-                    :default "http://localhost:8080"
-                    :description "Address of target upload-api instance."}]]
+     [:upload-api [string? {:short-option "-a"
+                            :default "http://localhost:8080"
+                            :description "Address of target upload-api instance."}]]
      [:log-level [:enum {:decode/string keyword
                          :short-option "-v"
                          :short-option/arg-number 0
-                         :short-option/update-fn (fn [options {:keys [path schema]} _cli-args]
-                                                   (update-in options path (malli-cli/children-successor schema)))
-                         :default :error}
+                         :short-option/update-fn malli-cli/non-idempotent-option
+                         :default :error
+                         :default->str name}
                   :off :fatal :error :warn :info :debug :trace :all]]
      [:proxy [:map
               [:host string?]
               [:port pos-int?]]]]))
 ```
 
-Also, here is what your configuration system provides:
+Here is the command summary produced for this config:
+
+``` txt
+  Short  Long option    Default                  Description
+         --show-config
+  -h     --help
+  -a     --upload-api   "http://localhost:8080"  Address of target upload-api instance.
+  -v     --log-level    error
+         --proxy-host
+         --proxy-port
+```
+
+Let's try to call this program. Here is what your configuration system provides:
 
 ``` clojure
 {:upload-api "https://example.com/upload"
@@ -102,6 +134,8 @@ and the resulting configuration passed to your app will be:
          :port 3128}
 ```
 
+---
+
 From a technical point of view, it leverages malli coercion and
 decoding capabilities so that you may define the shape of your
 configuration and default value in one place, then derive a
@@ -113,10 +147,10 @@ command-line interface from it.
 
 (defn load-config
   [args]
-  (deep-merge
+  (malli-cli/deep-merge
     ;; Default value
     (m/decode Config {} mt/default-value-transformer)
-    ;; Value retrieved from configuration system
+    ;; Value retrieved from any configuration system you want
     (:value (configure {:key service-name
                         :env (env)
                         :version (version)}))
@@ -126,12 +160,22 @@ command-line interface from it.
 (defn -main
   [& args]
   (let [config (load-config args)]
-    (if (m/validate Config config)
-      (app/start config)
-      (do (log/error "Invalid configuration value"
-                     (m/explain Config config))
-          (Thread/sleep 60000) ; Leave some time to retrieve the logs.
-          (System/exit 1)))))
+    (cond (not (m/validate Config config))
+          (do (log/error "Invalid configuration value"
+                         (m/explain Config config))
+              (Thread/sleep 60000) ; Leave some time to retrieve the logs.
+              (System/exit 1))
+
+          (:show-config? config)
+          (do (println config)
+              (System/exit 0))
+
+          (:help config)
+          (do (println (simple-summary Config))
+              (System/exit 0))
+
+          :else
+          (app/start config))))
 ```
 
 # Capabilities
@@ -225,8 +269,7 @@ See tests for minimal working code for each of these examples.
               keyword?
               [:enum {:short-option "-v"
                       :short-option/arg-number 0
-                      :short-option/update-fn (fn [options {:keys [in schema]} _cli-args]
-                                                (update-in options in (malli-cli/children-successor schema)))
+                      :short-option/update-fn malli-cli/non-idempotent-option
                       :default :error}
                :off :fatal :error :warn :info :debug :trace :all]]]]
 
