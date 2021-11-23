@@ -27,14 +27,17 @@ graceful merge of several overlapping config fragment:
 3. Value from some configuration management system;
 4. Command line arguments;
 
+The expected shape of your configuration being described as a malli
+schema so you can parse and decode strings as well as validating any
+constraints. It's quite powerful.
+
 # Maturity and evolution
 
-> TL;DR: account for some changes ahead, but it is usable as is and
-> should probably match your use case.
-
-The API can be expected to change as we're still in version
-`0.0.x`. However, given the examples below, it should cover most of
-your use cases with simplicity.
+Semantic versioning is used, so no breaking changes will be introduced
+without incrementing the major version. Some bug fixes may be
+introduced but I currently don't plan to add any new feature. As
+examplified belowe, `malli-cli` should cover most of your use cases
+with simplicity – or open an issue.
 
 # Naming
 
