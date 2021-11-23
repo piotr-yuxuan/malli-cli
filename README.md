@@ -22,10 +22,10 @@ system. As such it intends to play nicely with configuration tools, so
 the actual configuration value of your program is a map that is a
 graceful merge of several overlapping config fragment:
 
-1. Default configuration value.
+1. Default configuration value;
 2. Environment variables when the program starts up;
 3. Value from some configuration management system;
-4. Command line arguments;
+4. Command line arguments.
 
 The expected shape of your configuration being described as a malli
 schema so you can parse and decode strings as well as validating any
@@ -65,47 +65,54 @@ Let's consider this config schema:
 (def Config
   (m/schema
     [:map {:closed true, :decode/args-transformer malli-cli/args-transformer}
-     [:show-config? [boolean? {:optional true
-                               :arg-number 0
-                               :description "Print actual configuration value and exit."}]]
-     [:help [boolean? {:short-option "-h"
+     [:show-config? [boolean? {:description "Print actual configuration value and exit."
+                               :optional true
+                               :arg-number 0}]]
+     [:help [boolean? {:description "Display usage summary and exit."
+                       :short-option "-h"
                        :optional true
                        :arg-number 0}]]
-     [:upload-api [string? {:short-option "-a"
+     [:upload-api [string? {:description "Address of target upload-api instance. If not set from the command line, lookup env var $CORP_UPLOAD_API."
+                            :short-option "-a"
+                            ;; Cli option will be looked up, then env var, then default.
                             :env-var "CORP_UPLOAD_API"
-                            :default "http://localhost:8080"
-                            :description "Address of target upload-api instance."}]]
-     [:log-level [:enum {:decode/string keyword
+                            :default "http://localhost:8080"}]]
+     [:log-level [:enum {:description "Non-idempotent -v increases log level, --log-level sets it."
+                         ;; Express how to decode a string into an enum value.
+                         :decode/string keyword
                          :short-option "-v"
                          :short-option/arg-number 0
                          :short-option/update-fn malli-cli/non-idempotent-option
                          :default :error
+                         ;; Used in summary to pretty-print the default value to a string.
                          :default->str name}
                   :off :fatal :error :warn :info :debug :trace :all]]
      [:proxy [:map
               [:host string?]
+              ;; malli will parse and return an integer.
               [:port pos-int?]]]]))
 ```
 
-Here is the command summary produced by `(malli-cli/summary)` for this
-config:
+Here is the command summary produced by `(malli-cli/summary Config)`
+for this config:
 
 ``` txt
   Short  Long option    Default                  Description
          --show-config                           Print actual configuration value and exit.
-  -h     --help
-  -a     --upload-api   "http://localhost:8080"  Address of target upload-api instance.
-  -v     --log-level    error
+  -h     --help                                  Display usage summary and exit.
+  -a     --upload-api   "http://localhost:8080"  Address of target upload-api instance. If not set from the command line, lookup env var $CORP_UPLOAD_API.
+  -v     --log-level    error                    Non-idempotent -v increases log level, --log-level sets it.
          --proxy-host
          --proxy-port
 ```
 
-Let's try to call this program. You may invoke your Clojure main function with:
+Let's try to call this program (code details below). You may invoke
+your Clojure main function with:
 
 ``` zsh
 lein run \
   --help -vvv \
-  -a "https://localhost:3004"
+  -a "https://localhost:4000"
 ```
 
 Let's suppose your configuration system provides this value:
@@ -116,17 +123,34 @@ Let's suppose your configuration system provides this value:
 ```
 
 and the shell environment variable `CORP_UPLOAD_API` is set to
-`https://localhost:3004`. Then the resulting configuration passed to
+`https://localhost:7000`. Then the resulting configuration passed to
 your app will be:
 
 ``` clojure
 {:help true
- :upload-api "https://localhost:3004"
+ :upload-api "https://localhost:4000"
  :log-level :debug
  :proxy {;; Nested config maps are supported
          :host "http://proxy.example.com"
          ;; malli transform strings into appropriate types
          :port 3128}
+```
+
+Let's try another time with this command with same provided config and
+env vars:
+
+``` zsh
+lein run \
+  --log-level=off
+  --show-config
+```
+
+The program will exit after printing:
+
+``` clojure
+{:log-level :off,
+ :show-config? true,
+ :upload-api "http://localhost:7000"}
 ```
 
 ---
@@ -139,6 +163,7 @@ command-line interface from it.
 ``` clojure
 (require '[piotr-yuxuan.malli-cli :as malli-cli])
 (require '[malli.core :as m])
+(require '[clojure.pprint])
 (require '[piotr-yuxuan.utils :refer [deep-merge]])
 
 (defn load-config
@@ -161,7 +186,7 @@ command-line interface from it.
               (System/exit 1))
 
           (:show-config? config)
-          (do (println config)
+          (do (clojure.pprint/pprint config)
               (System/exit 0))
 
           (:help config)
