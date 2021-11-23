@@ -1,11 +1,11 @@
 (ns piotr-yuxuan.malli-cli
-  (:require [piotr-yuxuan.domain.posix :as posix]
-            [piotr-yuxuan.domain.gnu :as gnu]
-            [clojure.data]
+  (:require [piotr-yuxuan.domain.gnu :as gnu]
+            [piotr-yuxuan.domain.posix :as posix]
+            [piotr-yuxuan.malli :as m']
+            [piotr-yuxuan.utils :refer [remove-key -make-format]]
             [clojure.string :as str]
             [malli.core :as m]
-            [malli.transform :as mt]
-            [malli.util :as mu])
+            [malli.transform :as mt])
   (:import (clojure.lang MapEntry)))
 
 (defn children-successor
@@ -42,18 +42,6 @@
   (cond (not (keyword? x)) [(str x)]
         (namespace x) [(namespace x) (name x)]
         :else [(name x)]))
-
-(defn value-schemas
-  "Returns all leaf sub schemas for unique paths as a vector of maps
-  with :schema, :path and :in keys."
-  [schema]
-  (->> schema
-       mu/subschemas
-       (remove (comp #{:map} m/type :schema))))
-
-(def ^{:arglists '([f m])}
-  remove-key
-  #(#'clojure.core/filter-key first (complement %1) %2))
 
 (def default-arg-number
   1)
@@ -198,32 +186,40 @@
              (conj operands arg)
              argstail))))
 
-(def cli-args-transformer
+(def args-transformer
   "The malli transformer wrapping `parse-args`. To be used it with
   `m/decode`, wrapped by `mt/transformer`. Merely turn a sequence of
   arguments `args` into a map that (maybe) conforms to a `schema`. You
   can compose this transformer to further refine command-line argument
-  parsing. See `simple-cli-options-transformer` for an example."
-  {:name :cli-args-transformer
+  parsing. See `simple-cli-transformer` for an example."
+  {:name :args-transformer
    :compile (fn [schema _]
-              (let [label+value-schemas (->> (value-schemas schema)
+              (let [label+value-schemas (->> (m'/value-schemas schema)
                                              (mapcat label+value-schema)
                                              (into {}))]
                 (fn [args]
                   (parse-args label+value-schemas
                               args))))})
 
-(def simple-cli-options-transformer
-  "Simple transformer for the most common use cases when you only want
-  to get a (nested) map of options out of command-line arguments. The
-  `mt/default-value-transformer` will fill the blank and
-  `mt/strip-extra-keys-transformer` will remove any extraneous
-  keys. Use it for dumb, do-what-I-mean cli args parsing."
+(def cli-transformer
+  "Use it for dumb, do-what-I-mean cli args parsing. Simple transformer
+  for the most common use cases when you only want to get a (nested)
+  map of options out of command-line arguments:
+
+  - `mt/strip-extra-keys-transformer` will remove any extraneous keys;
+
+  - `m'/default-value-transformer` with `:env-var` injects environment
+    variables (read at decode time);
+
+  - `(mt/default-value-transformer {:key :default})` fills the blank
+    with default values when applicable."
   (mt/transformer
-    cli-args-transformer
-    mt/strip-extra-keys-transformer
-    mt/default-value-transformer
-    mt/string-transformer))
+    args-transformer
+    mt/strip-extra-keys-transformer ; Remove it for debug, or more advanced usage.
+    mt/string-transformer
+    (m'/default-value-transformer {:key :env-var
+                                   :default-fn #(System/getenv %)})
+    (mt/default-value-transformer {:key :default})))
 
 (defn start-with?
   "Return true if the collection `path` starts with all the items of
@@ -244,14 +240,7 @@
                           (remove (comp (partial start-with? prefix) :path) remainder))
             :else (recur tail known-prefix? remainder)))))
 
-(defn -make-format
-  ;; From clojure/tools.cli
-  "Given a sequence of column widths, return a string suitable for use in
-  format to print a sequences of strings in those columns."
-  [lens]
-  (str/join (map #(str "  %" (when-not (zero? %) (str "-" %)) "s") lens)))
-
-(def simple-summary-header
+(def summary-header
   ["Short" "Long option" "Default" "Description"])
 
 (defn default-value
@@ -261,12 +250,12 @@
         default (-> value-schema first second :default)]
     (default->str default)))
 
-(defn simple-summary
+(defn summary
   [schema]
   (let [short-option-name (comp first second)
         long-option-name (comp first first)
         description (comp #(->> % :description (:summary %)) second first)
-        summary-table (->> (value-schemas schema)
+        summary-table (->> (m'/value-schemas schema)
                            prefix-shadowing
                            (map label+value-schema)
                            ;; All through `str` so that nil is rendered as empty string.
@@ -274,7 +263,7 @@
                                       (comp str long-option-name)
                                       (comp str default-value)
                                       (comp str description)))
-                           (cons simple-summary-header))
+                           (cons summary-header))
         max-column-widths (reduce (fn [acc row] (map (partial max) (map count row) acc))
                                   (repeat 0)
                                   summary-table)]
@@ -282,20 +271,3 @@
                           (let [fmt (-make-format max-column-widths)]
                             (.stripTrailing ^String (apply format fmt v))))
                         summary-table))))
-
-(defn deep-merge
-  "It merges maps recursively. It merges the maps from left
-  to right and the right-most value wins. It is useful to merge the
-  user defined configuration on top of the default configuration.
-  example:
-  ``` clojure
-  (deep-merge {:foo 1 :bar {:baz 2}}
-              {:foo 2 :bar {:baz 1 :qux 3}})
-  ;;=> {:foo 2, :bar {:baz 1, :qux 3}}
-  ```
-  From https://github.com/BrunoBonacci/1config"
-  [& maps]
-  (let [maps (filter (comp not nil?) maps)]
-    (if (every? map? maps)
-      (apply merge-with deep-merge maps)
-      (last maps))))

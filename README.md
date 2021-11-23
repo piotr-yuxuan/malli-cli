@@ -9,26 +9,34 @@ Command-line interface with malli.
 [![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
 
-You may also be interested in https://github.com/l3nz/cli-matic which
-is more established.
-
 # What it offers
 
-This library provides out-of-the-box cli parsing. It exposes a
-function which takes a vector of strings `args` as input and return a
-map that can later be merged with the config. As such it intends to
-play nicely with configuration tools, so you may have the following
-workflow:
+This library provides out-of-the-box command line interface. It
+exposes a function that takes the `args` vector of `-main` and returns
+a map representing the parsed, decoded arguments and environment
+variables you are interested in.
 
-- Retrieve value from some configuration management system;
-- Consider command line arguments as configuration ad-hoc overrides,
-  tokenise them and structure them into a map of command-line options;
-- Merge the two partial values above and fill the blank with default
-  values;
-- If the resulting value conforms to what you expect (schema
-  validation) you may finally use it with confidence.
+The return map can be used as a config fragment, or overrides, that
+you can later merge with the config value provided by any other
+system. As such it intends to play nicely with configuration tools, so
+the actual configuration value of your program is a map that is a
+graceful merge of several overlapping config fragment:
 
-# Standards
+1. Default configuration value.
+2. Environment variables when the program starts up;
+3. Value from some configuration management system;
+4. Command line arguments;
+
+# Maturity and evolution
+
+> TL;DR: account for some changes ahead, but it is usable as is and
+> should probably match your use case.
+
+The API can be expected to change as we're still in version
+`0.0.x`. However, given the examples below, it should cover most of
+your use cases with simplicity.
+
+# Naming
 
 ``` txt
 utility_name [-a][-b][-c option_argument]
@@ -43,26 +51,6 @@ an "option-argument", as shown with `[ -c option_argument]`. The
 arguments following the last options and option-arguments are named
 "operands".
 
-Any differences from the standards is considered a bug.
-- [GNU Program Argument Syntax Conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html)
-- [POSIX.1-2017 Utility argument syntax](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html)"
-
-# Maturity and evolution
-
-> TL;DR: account for some changes ahead, but it is usable as is and
-> should probably match your use case.
-
-The API can be expected to change as we're still in version
-`0.0.x`. However, given the examples below, one would say that it
-covers all of the use cases one could think about regarding
-command-line arguments.
-
-However, a command-line interface is not restricted to arguments but
-should also gracefully handle environement variables. It is currently
-possible (see example below) but it could probably be made much
-simpler and straightforward. Please your input on this if you have any
-🙂!
-
 # Simple example
 
 Let's consider this config schema:
@@ -73,13 +61,15 @@ Let's consider this config schema:
 
 (def Config
   (m/schema
-    [:map {:closed true, :decode/cli-args-transformer malli-cli/cli-args-transformer}
+    [:map {:closed true, :decode/args-transformer malli-cli/args-transformer}
      [:show-config? [boolean? {:optional true
-                               :arg-number 0}]]
+                               :arg-number 0
+                               :description "Print actual configuration value and exit."}]]
      [:help [boolean? {:short-option "-h"
                        :optional true
                        :arg-number 0}]]
      [:upload-api [string? {:short-option "-a"
+                            :env-var "CORP_UPLOAD_API"
                             :default "http://localhost:8080"
                             :description "Address of target upload-api instance."}]]
      [:log-level [:enum {:decode/string keyword
@@ -94,11 +84,12 @@ Let's consider this config schema:
               [:port pos-int?]]]]))
 ```
 
-Here is the command summary produced for this config:
+Here is the command summary produced by `(malli-cli/summary)` for this
+config:
 
 ``` txt
   Short  Long option    Default                  Description
-         --show-config
+         --show-config                           Print actual configuration value and exit.
   -h     --help
   -a     --upload-api   "http://localhost:8080"  Address of target upload-api instance.
   -v     --log-level    error
@@ -106,15 +97,7 @@ Here is the command summary produced for this config:
          --proxy-port
 ```
 
-Let's try to call this program. Here is what your configuration system provides:
-
-``` clojure
-{:upload-api "https://example.com/upload"
- :proxy {:host "https://proxy.example.com"
-         :port 3128}}
-```
-
-You may invoke your Clojure main function with:
+Let's try to call this program. You may invoke your Clojure main function with:
 
 ``` zsh
 lein run \
@@ -122,7 +105,16 @@ lein run \
   -a "https://localhost:3004"
 ```
 
-and the resulting configuration passed to your app will be:
+Let's suppose your configuration system provides this value:
+
+``` clojure
+{:proxy {:host "https://proxy.example.com"
+         :port 3128}}
+```
+
+and the shell environment variable `CORP_UPLOAD_API` is set to
+`https://localhost:3004`. Then the resulting configuration passed to
+your app will be:
 
 ``` clojure
 {:help true
@@ -144,18 +136,17 @@ command-line interface from it.
 ``` clojure
 (require '[piotr-yuxuan.malli-cli :as malli-cli])
 (require '[malli.core :as m])
+(require '[piotr-yuxuan.utils :refer [deep-merge]])
 
 (defn load-config
   [args]
-  (malli-cli/deep-merge
-    ;; Default value
-    (m/decode Config {} mt/default-value-transformer)
+  (deep-merge
     ;; Value retrieved from any configuration system you want
     (:value (configure {:key service-name
                         :env (env)
                         :version (version)}))
-    ;; Command-line overrides
-    (m/decode Config args malli-cli/simple-cli-options-transformer)))
+    ;; Command-line arguments, env-vars, and default values.
+    (m/decode Config args malli-cli/cli-transformer)))
 
 (defn -main
   [& args]
@@ -188,7 +179,7 @@ See tests for minimal working code for each of these examples.
 {:long-option "VALUE"}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
   [:long-option string?]]
 ```
 
@@ -198,7 +189,7 @@ See tests for minimal working code for each of these examples.
 {:long-option "VALUE"}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
   [:long-option string?]]
 ```
 
@@ -208,7 +199,7 @@ See tests for minimal working code for each of these examples.
 {:some-option "VALUE"}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:some-option [string? {:short-option "-s"}]]]
 ```
 
@@ -221,7 +212,7 @@ See tests for minimal working code for each of these examples.
  :c ["val1" "val2"]}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:a [boolean? {:arg-number 0}]]
  [:b string?]
  [:c [string? {:arg-number 2}]]]
@@ -237,7 +228,7 @@ See tests for minimal working code for each of these examples.
  :piotr-yuxuan.malli-cli/arguments ["ARG0" "ARG1" "ARG2"]}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:a [boolean? {:arg-number 0}]]
  [:b string?]]
 ```
@@ -250,7 +241,7 @@ See tests for minimal working code for each of these examples.
  :list true}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:help [boolean? {:short-option "-h" :arg-number 0}]]
  [:all [boolean? {:short-option "-a" :arg-number 0}]]
  [:list [boolean? {:short-option "-l" :arg-number 0}]]]
@@ -264,7 +255,7 @@ See tests for minimal working code for each of these examples.
 {:log-level :debug}
 
 ;; Example schemas:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:log-level [:and
               keyword?
               [:enum {:short-option "-v"
@@ -273,7 +264,7 @@ See tests for minimal working code for each of these examples.
                       :default :error}
                :off :fatal :error :warn :info :debug :trace :all]]]]
 
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:verbosity [int? {:short-option "-v"
                     :short-option/arg-number 0
                     :short-option/update-fn (fn [options {:keys [in]} _cli-args]
@@ -289,7 +280,7 @@ See tests for minimal working code for each of these examples.
          :port 3447}}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:proxy [:map
           [:host string?]
           [:port pos-int?]]]]
@@ -302,7 +293,7 @@ See tests for minimal working code for each of these examples.
 {:upload/parallelism 32}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:upload/parallelism pos-int?]]
 ```
 
@@ -315,7 +306,7 @@ See tests for minimal working code for each of these examples.
  :first-letter \P}
 
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:vanity-name [string? {:long-option "--name"
                          :update-fn (fn [options {:keys [in]} [username]]
                                       (-> options
@@ -340,7 +331,7 @@ See tests for minimal working code for each of these examples.
 
 ``` clojure
 ;; Example schema:
-[:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+[:map {:decode/args-transformer malli-cli/args-transformer}
  [:my-option string?]]
 
 ;; Example input:
@@ -353,56 +344,23 @@ See tests for minimal working code for each of these examples.
                          :cli-args ["--unknown-long-option" "--other-option" "VALUE" "-s"]}
 ```
 
-- Handle environment variables (good enough for now but subject to
-  further API change):
+- Environment variable `USER` set to `piotr-yuxuan` may give:
 
 ``` clojure
-;; Example schema.
-(def Config
-  [:map
-   [:options
-    [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
-     [:commands [:vector {:long-option "--command"
-                          :update-fn (fn [options {:keys [in]} [command]]
-                                       (update-in options in (fnil conj []) command))}
-                 keyword?]]]]
-   [:env
-    [:map
-     [:user string?]
-     [:pwd string?]]]])
+{:user "piotr-yuxuan"}
 
-;; Example code. To keep it straightforward, config here only comes
-;; from malli-cli. The `:env` map will be stripped of extra keys by the
-;; transformer.
-(require '[camel-snake-kebab.core :as csk])
-(require '[malli.transform :as mt])
-(defn load-config
-  [env args]
-  (m/decode Config
-            {:options args
-             :env (into {} env)}
-            (mt/transformer
-              (mt/key-transformer {:decode csk/->kebab-case-keyword})
-              malli-cli/cli-args-transformer
-              mt/strip-extra-keys-transformer
-              mt/default-value-transformer
-              mt/string-transformer)))
-
-;; Example usage:
-(load-config
-  (System/getenv)
-  ["--command" "init-db" "--command" "conform-repo"])
-;; =>
-  #_
-  {:options {:commands [:init-db :conform-repo]},
-   :env {:pwd "~",
-         :user "piotr-yuxuan"}}
-
-;; Another example usage, showing config validation:
-(let [config (load-config
-               (System/getenv)
-               args)]
-  (when-not (m/validate Config config)
-    (pp/pprint (m/explain m/validate Config config))
-    (System/exit 1)))
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:user [string? {:env-var "USER"}]]]
 ```
+
+Note that environment variables behave like default values with lower
+priority than command-line arguments. Env vars are resolved at decode
+time, not at schema compile time. This lack of purity is balanced by
+the environment being constant and set by the JVM at start-up time.
+
+# References
+
+- [GNU Program Argument Syntax Conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html)
+- [POSIX.1-2017 Utility argument syntax](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html)"
+- https://github.com/l3nz/cli-matic is a similar, more established project.

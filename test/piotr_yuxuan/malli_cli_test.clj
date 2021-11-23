@@ -3,7 +3,8 @@
             [piotr-yuxuan.malli-cli :as malli-cli]
             [malli.core :as m]
             [malli.transform :as mt]
-            [malli.util :as mu]))
+            [malli.util :as mu]
+            [piotr-yuxuan.malli :as m']))
 
 (deftest children-successor-test
   (is (= (malli-cli/children-successor [:enum :a :b :c :d])
@@ -25,11 +26,11 @@
   (is (= ["0" "a" "b" "c" "d" "e"] (mapcat malli-cli/name-items [0 :a :b/c #"d" 'e]))))
 
 (deftest config-option-schemas-test
-  (let [type-schemas (malli-cli/value-schemas [:map
-                                               [:a [:map
-                                                    [:b int?]
-                                                    [:c int?]]]
-                                               [:d int?]])]
+  (let [type-schemas (m'/value-schemas [:map
+                                        [:a [:map
+                                             [:b int?]
+                                             [:c int?]]]
+                                        [:d int?]])]
     (doseq [schema (map :schema type-schemas)]
       ;; Too bad we can't use `=`.
       (is (mu/equals schema int?)))
@@ -44,7 +45,7 @@
                           [:leaf-0-0 int?]
                           [:leaf-0-1 int?]]]
                 [:node-1 int?]]]
-    (is (= (->> (malli-cli/value-schemas schema)
+    (is (= (->> (m'/value-schemas schema)
                 (mapcat malli-cli/label+value-schema)
                 (into {})
                 keys)
@@ -55,7 +56,7 @@
                           [:default-long-option-name [int? {:short-option "-y"}]]]]
                 [:node-1 [int? {:long-option "--foo"
                                 :short-option "-b"}]]]]
-    (is (= (->> (malli-cli/value-schemas schema)
+    (is (= (->> (m'/value-schemas schema)
                 (mapcat malli-cli/label+value-schema)
                 (into {})
                 keys)
@@ -63,7 +64,7 @@
 
 (deftest parse-option-test
   (testing "top-level option"
-    (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:my-long-option [:enum :a :b :c :d]]])
+    (let [label+value-schemas (->> (m'/value-schemas [:map [:my-long-option [:enum :a :b :c :d]]])
                                    (mapcat malli-cli/label+value-schema)
                                    (into {}))
           options {:existing {:parsed "options"}}
@@ -72,7 +73,7 @@
       (is (= options {:existing {:parsed "options"}, :my-long-option "a"}))
       (is (= argstail '("--other-options" "and" "args")))))
   (testing "nested option"
-    (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:my-long [:map [:nested-option int?]]]])
+    (let [label+value-schemas (->> (m'/value-schemas [:map [:my-long [:map [:nested-option int?]]]])
                                    (mapcat malli-cli/label+value-schema)
                                    (into {}))
           options {:existing {:parsed "options"}}
@@ -81,7 +82,7 @@
       (is (= options {:existing {:parsed "options"}, :my-long {:nested-option 1}}))
       (is (= argstail '("--other-options" "and" "args")))))
   (testing "multiple arguments"
-    (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:my-option [string? {:arg-number 2}]]])
+    (let [label+value-schemas (->> (m'/value-schemas [:map [:my-option [string? {:arg-number 2}]]])
                                    (mapcat malli-cli/label+value-schema)
                                    (into {}))
           options {:existing {:parsed "options"}}
@@ -91,9 +92,9 @@
       (is (= argstail '("--other-options" "and" "args")))))
   (testing "with update-fn"
     (testing "with multiple arguments"
-      (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:my-option [string? {:arg-number 2
-                                                                                          :update-fn (fn [options {:keys [path]} cli-args]
-                                                                                                       (assoc-in options path (vec (reverse cli-args))))}]]])
+      (let [label+value-schemas (->> (m'/value-schemas [:map [:my-option [string? {:arg-number 2
+                                                                                   :update-fn (fn [options {:keys [path]} cli-args]
+                                                                                                (assoc-in options path (vec (reverse cli-args))))}]]])
                                      (mapcat malli-cli/label+value-schema)
                                      (into {}))
             options {:existing {:parsed "options"}}
@@ -102,8 +103,8 @@
         (is (= options {:existing {:parsed "options"}, :my-option ["b" "a"]}))
         (is (= argstail '("--other-options" "and" "args")))))
     (testing "transforming the value in update-fn"
-      (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:my-option [string? {:update-fn (fn [options {:keys [path]} [cli-arg]]
-                                                                                                       (assoc-in options path (str "grr-" cli-arg)))}]]])
+      (let [label+value-schemas (->> (m'/value-schemas [:map [:my-option [string? {:update-fn (fn [options {:keys [path]} [cli-arg]]
+                                                                                                (assoc-in options path (str "grr-" cli-arg)))}]]])
                                      (mapcat malli-cli/label+value-schema)
                                      (into {}))
             options {:existing {:parsed "options"}}
@@ -112,9 +113,9 @@
         (is (= options {:existing {:parsed "options"}, :my-option "grr-a"}))
         (is (= argstail '("--other-options" "and" "args"))))
       (testing "with short value"
-        (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:a [string? {:short-option "-a"
-                                                                                    :update-fn (fn [options {:keys [path]} [cli-arg]]
-                                                                                                 (assoc-in options path (str "grr-" cli-arg)))}]]])
+        (let [label+value-schemas (->> (m'/value-schemas [:map [:a [string? {:short-option "-a"
+                                                                             :update-fn (fn [options {:keys [path]} [cli-arg]]
+                                                                                          (assoc-in options path (str "grr-" cli-arg)))}]]])
                                        (mapcat malli-cli/label+value-schema)
                                        (into {}))
               options {:existing {:parsed "options"}}
@@ -123,10 +124,10 @@
           (is (= options {:existing {:parsed "options"}, :a "grr-a"}))
           (is (= argstail '("--other-options" "and" "args"))))))
     (testing "accumulating values"
-      (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:files [string? {:short-option "-f"
-                                                                                      :long-option "--file"
-                                                                                      :update-fn (fn [options {:keys [path]} [file]]
-                                                                                                   (update-in options path conj file))}]]])
+      (let [label+value-schemas (->> (m'/value-schemas [:map [:files [string? {:short-option "-f"
+                                                                               :long-option "--file"
+                                                                               :update-fn (fn [options {:keys [path]} [file]]
+                                                                                            (update-in options path conj file))}]]])
                                      (mapcat malli-cli/label+value-schema)
                                      (into {}))]
         (testing "with long option"
@@ -143,10 +144,10 @@
 
 (deftest break-short-option-group-test
   (testing "with no arguments"
-    (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:verbose [string? {:short-option "-v"
-                                                                                      :arg-number 0
-                                                                                      :update-fn (fn [options {:keys [path]} _]
-                                                                                                   (update-in options path (fnil inc 0)))}]]])
+    (let [label+value-schemas (->> (m'/value-schemas [:map [:verbose [string? {:short-option "-v"
+                                                                               :arg-number 0
+                                                                               :update-fn (fn [options {:keys [path]} _]
+                                                                                            (update-in options path (fnil inc 0)))}]]])
                                    (mapcat malli-cli/label+value-schema)
                                    (into {}))
           [arg & argstail] ["-vvv" "--other-options" "and" "args"]]
@@ -155,9 +156,9 @@
                                                  argstail)
              '("-v" "-v" "-v" "--other-options" "and" "args")))))
   (testing "with one argument"
-    (let [label+value-schemas (->> (malli-cli/value-schemas [:map [:files [string? {:short-option "-f"
-                                                                                    :update-fn (fn [options {:keys [path]} [file]]
-                                                                                                 (update-in options path conj file))}]]])
+    (let [label+value-schemas (->> (m'/value-schemas [:map [:files [string? {:short-option "-f"
+                                                                             :update-fn (fn [options {:keys [path]} [file]]
+                                                                                          (update-in options path conj file))}]]])
                                    (mapcat malli-cli/label+value-schema)
                                    (into {}))
           [arg & argstail] ["-fff" "file://my-file" "file://your-file" "file://another-file" "--other-options" "and" "args"]]
@@ -170,7 +171,7 @@
   (m/schema
     [:map {;; When not defined, the map is turned into standard summary.
            :summary-fn nil
-           :decode/cli-args-transformer malli-cli/cli-args-transformer}
+           :decode/args-transformer malli-cli/args-transformer}
      [:help [boolean? {:short-option "-h"
                        :default false
                        :arg-number 0}]]
@@ -185,6 +186,7 @@
                    :off :fatal :error :warn :info :debug :trace :all]]]
      [:upload-api [string?
                    {:short-option "-a"
+                    :env-var "CORP_UPLOAD_API"
                     :default "http://localhost:8080"
                     :description "Address of target upload-api instance."}]]
      [:database [string?
@@ -210,11 +212,11 @@
                                         :summary "Create the dataset."
                                         :description "If true, needs `--database` to be set. It will create the dataset. Canary test will be performed after the version is published, because database needs at least one version to have been published before it can respond."}]]]))
 
-(deftest cli-args-transformer-test
-  (is (= (m/decode MyCliSchema [] (mt/transformer malli-cli/cli-args-transformer))
+(deftest args-transformer-test
+  (is (= (m/decode MyCliSchema [] (mt/transformer malli-cli/args-transformer))
          #:piotr-yuxuan.malli-cli{:operands [], :cli-args []}))
   (let [cli-args ["-vvv" "--upload-api" "http://localhost:8080" "--market" "FRANCE" "--market=UNITED_KINGDOM" "random-arg" "--upload-data-file" "samples/primary.edn" "--upload-data-format" "line-edn" "--proxy-host" "localhost" "--proxy-port" "8081" "--" "little" "weasel"]]
-    (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-args-transformer))
+    (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/args-transformer))
            {:log-level :all,
             :upload-api "http://localhost:8080",
             :markets '("UNITED_KINGDOM" "FRANCE"),
@@ -223,7 +225,7 @@
             ::malli-cli/operands ["random-arg" "little" "weasel"],
             :piotr-yuxuan.malli-cli/cli-args cli-args})))
   (let [cli-args ["-v" "--upload-api" "http://localhost:8080" "--market" "FRANCE" "--market=UNITED_KINGDOM" "random-arg" "--upload-data-file" "samples/primary.edn" "--upload-data-format" "line-edn" "--proxy-host" "localhost" "--proxy-port" "8081" "--" "little" "weasel"]]
-    (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-args-transformer))
+    (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/args-transformer))
            {:log-level :debug,
             :upload-api "http://localhost:8080",
             :markets '("UNITED_KINGDOM" "FRANCE"),
@@ -231,25 +233,40 @@
             :proxy {:host "localhost", :port "8081"},
             ::malli-cli/operands ["random-arg" "little" "weasel"],
             :piotr-yuxuan.malli-cli/cli-args cli-args})))
-  (is (= (m/decode MyCliSchema ["--help"] (mt/transformer malli-cli/cli-args-transformer))
+  (is (= (m/decode MyCliSchema ["--help"] (mt/transformer malli-cli/args-transformer))
          {:help true, ::malli-cli/operands [], :piotr-yuxuan.malli-cli/cli-args ["--help"]}))
   (let [cli-args ["--log-level" "all"]]
-    (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-args-transformer))
+    (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/args-transformer))
            {:log-level "all", ::malli-cli/operands [], :piotr-yuxuan.malli-cli/cli-args ["--log-level" "all"]}))
-    (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/simple-cli-options-transformer))
+    (is (= (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-transformer))
            {:log-level :all,
             :help false,
             :upload-api "http://localhost:8080",
             :database "http://localhost:8888",
             :async-parallelism 64,
-            :create-market-dataset false}))))
+            :create-market-dataset false})))
+  (testing "environment variables"
+    (let [env {"CORP_UPLOAD_API" "https://api.upload-big-corp.com/data"}
+          transformer (mt/transformer
+                        (mt/transformer
+                          malli-cli/args-transformer
+                          mt/strip-extra-keys-transformer
+                          ;; Custom default-fn for env vars.
+                          (m'/default-value-transformer {:key :env-var
+                                                         :default-fn env})))]
+      (let [cli-args []]
+        (is (= (m/decode MyCliSchema cli-args transformer)
+               {:upload-api "https://api.upload-big-corp.com/data"})))
+      (let [cli-args ["-a" "https://mock"]]
+        (is (= (m/decode MyCliSchema cli-args transformer)
+               {:upload-api "https://mock"}))))))
 
 (deftest error-test
   (let [cli-args ["--unknown-long-option" "--my-option" "VALUE" "-s"]]
-    (is (= (m/decode [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+    (is (= (m/decode [:map {:decode/args-transformer malli-cli/args-transformer}
                       [:my-option string?]]
                      cli-args
-                     (mt/transformer malli-cli/cli-args-transformer))
+                     (mt/transformer malli-cli/args-transformer))
            {:piotr-yuxuan.malli-cli/unknown-option-errors '({:arg "-s"} {:arg "--unknown-long-option"}),
             :piotr-yuxuan.malli-cli/known-options '("--my-option"),
             :my-option "VALUE",
@@ -258,61 +275,61 @@
 
 (deftest capability-test
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:long-option string?]]
            ["--long-option" "VALUE"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:long-option "VALUE"}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:long-option string?]]
            ["--long-option=VALUE"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:long-option "VALUE"}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:some-option [string? {:short-option "-s"}]]]
            ["--some-option" "VALUE"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:some-option "VALUE"}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:a [boolean? {:arg-number 0}]]
             [:b string?]
             [:c [string? {:arg-number 2}]]]
            ["-a" "-b" "val0" "-c" "val1" "val2"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:a true
           :b "val0"
           :c ["val1" "val2"]}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:a [boolean? {:arg-number 0}]]
             [:b string?]]
            ["-a" "1" "ARG0" "-b" "2" "--" "ARG1" "ARG2"]
-           (mt/transformer malli-cli/cli-args-transformer))
+           (mt/transformer malli-cli/args-transformer))
          {:a true,
           :b "2",
           ::malli-cli/operands ["1" "ARG0" "ARG1" "ARG2"],
           ::malli-cli/cli-args ["-a" "1" "ARG0" "-b" "2" "--" "ARG1" "ARG2"]}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:help [boolean? {:short-option "-h" :arg-number 0}]]
             [:all [boolean? {:short-option "-a" :arg-number 0}]]
             [:list [boolean? {:short-option "-l" :arg-number 0}]]]
            ["-hal"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:help true
           :all true
           :list true}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:log-level [:and
                          keyword?
                          [:enum {:short-option "-v"
@@ -322,9 +339,9 @@
                                  :default :error}
                           :off :fatal :error :warn :info :debug :trace :all]]]]
            ["-vvv"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:log-level [:and
                          keyword?
                          [:enum {:short-option "-v"
@@ -333,41 +350,41 @@
                                  :default :error}
                           :off :fatal :error :warn :info :debug :trace :all]]]]
            ["-vvv"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:log-level :debug}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:verbosity [int? {:short-option "-v"
                                :short-option/arg-number 0
                                :short-option/update-fn (fn [options {:keys [in]} _cli-args]
                                                          (update-in options in (fnil inc 0)))
                                :default 0}]]]
            ["-vvv"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:verbosity 3}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:proxy [:map
                      [:host string?]
                      [:port pos-int?]]]]
            ["--proxy-host" "https://example.org/upload" "--proxy-port" "3447"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:proxy {:host "https://example.org/upload"
                   :port 3447}}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:upload/parallelism pos-int?]]
            ["--upload-parallelism" 32]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:upload/parallelism 32}))
 
   (is (= (m/decode
-           [:map {:decode/cli-args-transformer malli-cli/cli-args-transformer}
+           [:map {:decode/args-transformer malli-cli/args-transformer}
             [:vanity-name [string? {:long-option "--name"
-                                    :update-fn (fn [options {:keys [in]} [username]]
+                                    :update-fn (fn [options {:keys [_in]} [username]]
                                                  (-> options
                                                      (assoc :vanity-name (format ">> %s <<" username))
                                                      (assoc :original-name username)
@@ -375,13 +392,20 @@
             [:original-name string?]
             [:first-letter char?]]
            ["--name" "Piotr"]
-           (mt/transformer malli-cli/simple-cli-options-transformer))
+           (mt/transformer malli-cli/cli-transformer))
          {:vanity-name ">> Piotr <<"
           :original-name "Piotr"
-          :first-letter \P})))
+          :first-letter \P}))
+
+  (is (= (m/decode
+           [:map {:decode/args-transformer malli-cli/args-transformer}
+            [:user [string? {:env-var "USER"}]]]
+           []
+           (mt/transformer malli-cli/cli-transformer))
+         {:user (System/getenv "USER")})))
 
 (deftest simple-summary-test
-  (is (= (malli-cli/simple-summary MyCliSchema)
+  (is (= (malli-cli/summary MyCliSchema)
          "  Short  Long option              Default                  Description
   -h     --help                   false
   -a     --upload-api             \"http://localhost:8080\"  Address of target upload-api instance.
