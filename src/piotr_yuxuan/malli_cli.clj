@@ -219,7 +219,7 @@
     mt/string-transformer
     (m'/default-value-transformer {:key :env-var
                                    :default-fn #(System/getenv %)})
-    (mt/default-value-transformer {:key :default})))
+    (m'/default-value-transformer {:key :default})))
 
 (defn start-with?
   "Return true if the collection `path` starts with all the items of
