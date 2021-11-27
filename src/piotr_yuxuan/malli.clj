@@ -21,9 +21,9 @@
    (default-value-transformer nil))
   ([{:keys [key default-fn defaults] :or {key :default, default-fn identity}}]
    (let [get-default (fn [schema]
-                       (or (some-> schema m/properties key)
-                           (some-> schema m/properties :default-fn (#(%)))
-                           (some->> schema m/type (get defaults) (#(% schema)))))
+                       (if-some [default (some-> schema m/properties key)]
+                         default
+                         (some->> schema m/type (get defaults) (#(% schema)))))
          set-default {:compile (fn [schema _]
                                  (when-some [default (get-default schema)]
                                    (fn [x] (if (nil? x) default x))))}
