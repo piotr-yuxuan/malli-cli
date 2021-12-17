@@ -98,7 +98,7 @@
                                                          argstail)
         (and update-fn arg-number) (ParsingResult. (update-fn options value-schema (take arg-number argstail))
                                                    (drop arg-number argstail))
-        (= 0 arg-number) (ParsingResult. (assoc-in options in true)
+        (zero? arg-number) (ParsingResult. (assoc-in options in true)
                                          argstail)
         (= 1 arg-number) (ParsingResult. (assoc-in options in (first argstail))
                                          (rest argstail))
