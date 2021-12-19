@@ -1,0 +1,827 @@
+<html>
+ <head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="../coverage.css"/>  <title> piotr_yuxuan/malli_cli.clj </title>
+ </head>
+ <body>
+<span class="covered" title="1 out of 1 forms covered">
+                001&nbsp;&nbsp;(ns&nbsp;piotr-yuxuan.malli-cli
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                002&nbsp;&nbsp;&nbsp;&nbsp;(:require&nbsp;[piotr-yuxuan.domain.gnu&nbsp;:as&nbsp;gnu]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                003&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[piotr-yuxuan.domain.posix&nbsp;:as&nbsp;posix]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                004&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[piotr-yuxuan.malli&nbsp;:as&nbsp;m&#x27;]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                005&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[piotr-yuxuan.utils&nbsp;:refer&nbsp;[remove-key&nbsp;-make-format]]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                006&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[clojure.string&nbsp;:as&nbsp;str]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                007&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[malli.core&nbsp;:as&nbsp;m]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                008&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[malli.transform&nbsp;:as&nbsp;mt])
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                009&nbsp;&nbsp;&nbsp;&nbsp;(:import&nbsp;(clojure.lang&nbsp;MapEntry)))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                010&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                011&nbsp;&nbsp;(defn&nbsp;children-successor
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                012&nbsp;&nbsp;&nbsp;&nbsp;&quot;Given&nbsp;a&nbsp;schema&nbsp;`[:enum&nbsp;:a&nbsp;:b&nbsp;:c&nbsp;:d]`,&nbsp;return&nbsp;a&nbsp;Clojure&nbsp;map&nbsp;(that&nbsp;is,
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                013&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;queryable&nbsp;data&nbsp;structure)&nbsp;that&nbsp;returns&nbsp;the&nbsp;next&nbsp;item&nbsp;of
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                014&nbsp;&nbsp;&nbsp;&nbsp;:a&nbsp;-&gt;&nbsp;:b&nbsp;-&gt;&nbsp;:c&nbsp;-&gt;&nbsp;:d&nbsp;&lt;-&gt;&nbsp;:d.&nbsp;The&nbsp;last&nbsp;item&nbsp;is&nbsp;mapped&nbsp;onto&nbsp;itself.&nbsp;If
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                015&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;schema&nbsp;has&nbsp;a&nbsp;default&nbsp;value&nbsp;as&nbsp;a&nbsp;property,&nbsp;like&nbsp;in
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                016&nbsp;&nbsp;&nbsp;&nbsp;`[:enum&nbsp;{:default&nbsp;:b}&nbsp;:a&nbsp;:b&nbsp;:c&nbsp;:d]`&nbsp;an&nbsp;additional&nbsp;mapping&nbsp;will&nbsp;be
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                017&nbsp;&nbsp;&nbsp;&nbsp;made&nbsp;nil&nbsp;-&gt;&nbsp;:c.
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                018&nbsp;&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                019&nbsp;&nbsp;&nbsp;&nbsp;Primarily&nbsp;intended&nbsp;to&nbsp;be&nbsp;used&nbsp;on&nbsp;enum&nbsp;schema&nbsp;for&nbsp;non-idempotent
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                020&nbsp;&nbsp;&nbsp;&nbsp;options&nbsp;(like&nbsp;:verbose),&nbsp;but&nbsp;code&nbsp;is&nbsp;generic&nbsp;so&nbsp;you&nbsp;might&nbsp;think&nbsp;of&nbsp;a
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                021&nbsp;&nbsp;&nbsp;&nbsp;use&nbsp;case&nbsp;on&nbsp;another&nbsp;schema&nbsp;type.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                022&nbsp;&nbsp;&nbsp;&nbsp;[schema]
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                023&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[properties&nbsp;(m&#x2F;properties&nbsp;schema)
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                024&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;children&nbsp;(m&#x2F;children&nbsp;schema)
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;last-child&nbsp;(last&nbsp;children)]
+                </span><br/>
+<span class="partial" title="11 out of 13 forms covered">
+                026&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond-&gt;&nbsp;{}
+                </span><br/>
+<span class="covered" title="11 out of 11 forms covered">
+                027&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:item-&gt;successor&nbsp;(into&nbsp;(map&nbsp;vec&nbsp;(partition&nbsp;2&nbsp;1&nbsp;children)))
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                028&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;The&nbsp;transformer&nbsp;`mt&#x2F;default-value-transformer`&nbsp;is&nbsp;only
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                029&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;applied&nbsp;once&nbsp;the&nbsp;args&nbsp;vector&nbsp;is&nbsp;decoded&nbsp;into&nbsp;a&nbsp;map,&nbsp;so&nbsp;we
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                030&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;have&nbsp;to&nbsp;handle&nbsp;it&nbsp;manually.
+                </span><br/>
+<span class="covered" title="14 out of 14 forms covered">
+                031&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(contains?&nbsp;properties&nbsp;:default)&nbsp;(as-&gt;&nbsp;$&nbsp;(assoc&nbsp;$&nbsp;nil&nbsp;(get&nbsp;$&nbsp;(:default&nbsp;properties))))
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                032&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:loop-on-last&nbsp;(assoc&nbsp;last-child&nbsp;last-child))))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                033&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                034&nbsp;&nbsp;(def&nbsp;non-idempotent-option
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                035&nbsp;&nbsp;&nbsp;&nbsp;(fn&nbsp;[options&nbsp;{:keys&nbsp;[in&nbsp;schema]}&nbsp;_cli-args]
+                </span><br/>
+<span class="covered" title="7 out of 7 forms covered">
+                036&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(update-in&nbsp;options&nbsp;in&nbsp;(children-successor&nbsp;schema))))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                037&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                038&nbsp;&nbsp;(defn&nbsp;name-items
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                039&nbsp;&nbsp;&nbsp;&nbsp;&quot;Take&nbsp;an&nbsp;argument&nbsp;and&nbsp;return&nbsp;a&nbsp;vector&nbsp;of&nbsp;items&nbsp;that&nbsp;will&nbsp;form&nbsp;an
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                040&nbsp;&nbsp;&nbsp;&nbsp;option&nbsp;name.&nbsp;For&nbsp;example&nbsp;the&nbsp;option&nbsp;name&nbsp;for&nbsp;`:a&#x2F;b`&nbsp;will&nbsp;be&nbsp;a-b.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                041&nbsp;&nbsp;&nbsp;&nbsp;[x]
+                </span><br/>
+<span class="covered" title="12 out of 12 forms covered">
+                042&nbsp;&nbsp;&nbsp;&nbsp;(cond&nbsp;(not&nbsp;(keyword?&nbsp;x))&nbsp;[(str&nbsp;x)]
+                </span><br/>
+<span class="covered" title="10 out of 10 forms covered">
+                043&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(namespace&nbsp;x)&nbsp;[(namespace&nbsp;x)&nbsp;(name&nbsp;x)]
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                044&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:else&nbsp;[(name&nbsp;x)]))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                045&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                046&nbsp;&nbsp;(def&nbsp;default-arg-number
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                047&nbsp;&nbsp;&nbsp;&nbsp;1)
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                048&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                049&nbsp;&nbsp;(defn&nbsp;^MapEntry&nbsp;long-option-&gt;value-schema
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                050&nbsp;&nbsp;&nbsp;&nbsp;[default-label&nbsp;value-schema]
+                </span><br/>
+<span class="covered" title="15 out of 15 forms covered">
+                051&nbsp;&nbsp;&nbsp;&nbsp;(when-let&nbsp;[long-option&nbsp;(:long-option&nbsp;value-schema&nbsp;(when&nbsp;(&lt;&nbsp;1&nbsp;(count&nbsp;default-label))
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                052&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;Character&nbsp;?&nbsp;is&nbsp;reserved&nbsp;in&nbsp;shell
+                </span><br/>
+<span class="covered" title="8 out of 8 forms covered">
+                053&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(str&nbsp;&quot;--&quot;&nbsp;(str&#x2F;replace&nbsp;default-label&nbsp;#&quot;\?$&quot;&nbsp;&quot;&quot;))))]
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                054&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(MapEntry.&nbsp;long-option
+                </span><br/>
+<span class="covered" title="11 out of 11 forms covered">
+                055&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&gt;&nbsp;(remove-key&nbsp;(comp&nbsp;#{&quot;long-option&quot;&nbsp;&quot;short-option&quot;}&nbsp;namespace)&nbsp;value-schema)
+                </span><br/>
+<span class="partial" title="14 out of 15 forms covered">
+                056&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assoc&nbsp;:arg-number&nbsp;(or&nbsp;(:long-option&#x2F;arg-number&nbsp;value-schema)
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                057&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(:arg-number&nbsp;value-schema)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                058&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default-arg-number))
+                </span><br/>
+<span class="partial" title="9 out of 10 forms covered">
+                059&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assoc&nbsp;:update-fn&nbsp;(or&nbsp;(:long-option&#x2F;update-fn&nbsp;value-schema)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                060&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(:update-fn&nbsp;value-schema)))))))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                061&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                062&nbsp;&nbsp;(defn&nbsp;^MapEntry&nbsp;short-option-&gt;value-schema
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                063&nbsp;&nbsp;&nbsp;&nbsp;[default-label&nbsp;value-schema]
+                </span><br/>
+<span class="covered" title="9 out of 9 forms covered">
+                064&nbsp;&nbsp;&nbsp;&nbsp;(when-let&nbsp;[short-option&nbsp;(get&nbsp;value-schema
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                065&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:short-option
+                </span><br/>
+<span class="covered" title="6 out of 6 forms covered">
+                066&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(when&nbsp;(=&nbsp;1&nbsp;(count&nbsp;default-label))
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                067&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(str&nbsp;&quot;-&quot;&nbsp;default-label)))]
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                068&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(MapEntry.&nbsp;short-option
+                </span><br/>
+<span class="covered" title="11 out of 11 forms covered">
+                069&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(-&gt;&nbsp;(remove-key&nbsp;(comp&nbsp;#{&quot;long-option&quot;&nbsp;&quot;short-option&quot;}&nbsp;namespace)&nbsp;value-schema)
+                </span><br/>
+<span class="covered" title="15 out of 15 forms covered">
+                070&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assoc&nbsp;:arg-number&nbsp;(or&nbsp;(:short-option&#x2F;arg-number&nbsp;value-schema)
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                071&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(:arg-number&nbsp;value-schema)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                072&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default-arg-number))
+                </span><br/>
+<span class="covered" title="10 out of 10 forms covered">
+                073&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assoc&nbsp;:update-fn&nbsp;(or&nbsp;(:short-option&#x2F;update-fn&nbsp;value-schema)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                074&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(:update-fn&nbsp;value-schema)))))))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                075&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                076&nbsp;&nbsp;(defn&nbsp;label+value-schema
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                077&nbsp;&nbsp;&nbsp;&nbsp;&quot;Return&nbsp;`MapEntry`&nbsp;items,&nbsp;when&nbsp;applicable&nbsp;one&nbsp;for&nbsp;short,&nbsp;and&nbsp;long
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                078&nbsp;&nbsp;&nbsp;&nbsp;option&nbsp;names.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                079&nbsp;&nbsp;&nbsp;&nbsp;[{:keys&nbsp;[in&nbsp;schema]&nbsp;:as&nbsp;value-schema}]
+                </span><br/>
+<span class="partial" title="16 out of 17 forms covered">
+                080&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[in&#x27;&nbsp;(remove&nbsp;#(and&nbsp;(keyword?&nbsp;%)&nbsp;(=&nbsp;(namespace&nbsp;%)&nbsp;&quot;malli.core&quot;))&nbsp;in)
+                </span><br/>
+<span class="covered" title="7 out of 7 forms covered">
+                081&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default-label&nbsp;(-&gt;&gt;&nbsp;in&#x27;&nbsp;(mapcat&nbsp;name-items)&nbsp;(str&#x2F;join&nbsp;&quot;-&quot;))
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                082&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value-schema&#x27;&nbsp;(-&gt;&nbsp;value-schema
+                </span><br/>
+<span class="covered" title="8 out of 8 forms covered">
+                083&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(merge&nbsp;(m&#x2F;type-properties&nbsp;schema)&nbsp;(m&#x2F;properties&nbsp;schema))
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                084&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assoc&nbsp;:in&nbsp;in&#x27;))]
+                </span><br/>
+<span class="covered" title="5 out of 5 forms covered">
+                085&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(long-option-&gt;value-schema&nbsp;default-label&nbsp;value-schema&#x27;)
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                086&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(short-option-&gt;value-schema&nbsp;default-label&nbsp;value-schema&#x27;)]))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                087&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                088&nbsp;&nbsp;(defrecord&nbsp;ParsingResult
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                089&nbsp;&nbsp;&nbsp;&nbsp;[options&nbsp;argstail])
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                090&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                091&nbsp;&nbsp;(defn&nbsp;^ParsingResult&nbsp;-parse-option
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                092&nbsp;&nbsp;&nbsp;&nbsp;&quot;Take&nbsp;the&nbsp;current&nbsp;arglist&nbsp;head&nbsp;`arg`,&nbsp;the&nbsp;tail&nbsp;args-tail`.&nbsp;Depending
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                093&nbsp;&nbsp;&nbsp;&nbsp;on&nbsp;the&nbsp;value&nbsp;schema&nbsp;consume&nbsp;some&nbsp;items&nbsp;from&nbsp;the&nbsp;tail&nbsp;and&nbsp;when
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                094&nbsp;&nbsp;&nbsp;&nbsp;applicable&nbsp;pass&nbsp;them&nbsp;on&nbsp;to&nbsp;`update-fn`.&nbsp;This&nbsp;is&nbsp;actually&nbsp;the&nbsp;core&nbsp;of
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                095&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;work&nbsp;that&nbsp;transforms&nbsp;a&nbsp;vector&nbsp;of&nbsp;string&nbsp;to&nbsp;a&nbsp;map&nbsp;of&nbsp;options.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                096&nbsp;&nbsp;&nbsp;&nbsp;[{:keys&nbsp;[in&nbsp;update-fn&nbsp;arg-number&nbsp;schema]&nbsp;:as&nbsp;value-schema}&nbsp;options&nbsp;arg&nbsp;argstail]
+                </span><br/>
+<span class="partial" title="13 out of 29 forms covered">
+                097&nbsp;&nbsp;&nbsp;&nbsp;(cond&nbsp;(and&nbsp;update-fn&nbsp;(not&nbsp;arg-number))&nbsp;(ParsingResult.&nbsp;(update&nbsp;options&nbsp;::schema-errors&nbsp;conj&nbsp;{:message&nbsp;&quot;update-fn&nbsp;needs&nbsp;arg-number&quot;,&nbsp;:arg&nbsp;arg,&nbsp;:schema&nbsp;schema})
+                </span><br/>
+<span class="not-covered" title="0 out of 1 forms covered">
+                098&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;argstail)
+                </span><br/>
+<span class="covered" title="15 out of 15 forms covered">
+                099&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;update-fn&nbsp;arg-number)&nbsp;(ParsingResult.&nbsp;(update-fn&nbsp;options&nbsp;value-schema&nbsp;(take&nbsp;arg-number&nbsp;argstail))
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(drop&nbsp;arg-number&nbsp;argstail))
+                </span><br/>
+<span class="covered" title="8 out of 8 forms covered">
+                101&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(zero?&nbsp;arg-number)&nbsp;(ParsingResult.&nbsp;(assoc-in&nbsp;options&nbsp;in&nbsp;true)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                102&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;argstail)
+                </span><br/>
+<span class="covered" title="11 out of 11 forms covered">
+                103&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(=&nbsp;1&nbsp;arg-number)&nbsp;(ParsingResult.&nbsp;(assoc-in&nbsp;options&nbsp;in&nbsp;(first&nbsp;argstail))
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                104&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(rest&nbsp;argstail))
+                </span><br/>
+<span class="covered" title="14 out of 14 forms covered">
+                105&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(number?&nbsp;arg-number)&nbsp;(ParsingResult.&nbsp;(assoc-in&nbsp;options&nbsp;in&nbsp;(vec&nbsp;(take&nbsp;arg-number&nbsp;argstail)))
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                106&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(drop&nbsp;arg-number&nbsp;argstail))
+                </span><br/>
+<span class="not-covered" title="0 out of 13 forms covered">
+                107&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:generic-error&nbsp;(ParsingResult.&nbsp;(update&nbsp;options&nbsp;::schema-errors&nbsp;conj&nbsp;{:message&nbsp;&quot;generic&nbsp;error&quot;,&nbsp;:arg&nbsp;arg,&nbsp;:schema&nbsp;schema})
+                </span><br/>
+<span class="not-covered" title="0 out of 1 forms covered">
+                108&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;argstail)))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                109&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                110&nbsp;&nbsp;(defn&nbsp;break-short-option-group
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                111&nbsp;&nbsp;&nbsp;&nbsp;&quot;Expand&nbsp;a&nbsp;group&nbsp;of&nbsp;short&nbsp;option&nbsp;labels&nbsp;into&nbsp;a&nbsp;several&nbsp;short&nbsp;labels&nbsp;and
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                112&nbsp;&nbsp;&nbsp;&nbsp;interpolate&nbsp;them&nbsp;with&nbsp;the&nbsp;tail&nbsp;of&nbsp;the&nbsp;arglist&nbsp;args-tail`&nbsp;depending
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                113&nbsp;&nbsp;&nbsp;&nbsp;on&nbsp;the&nbsp;number&nbsp;of&nbsp;arguments&nbsp;each&nbsp;option&nbsp;needs.&nbsp;&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                114&nbsp;&nbsp;&nbsp;&nbsp;[label+value-schemas&nbsp;arg&nbsp;argstail]
+                </span><br/>
+<span class="covered" title="5 out of 5 forms covered">
+                115&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;[[{:keys&nbsp;[arg-number&nbsp;short-option]&nbsp;:as&nbsp;value-schema}&nbsp;&amp;&nbsp;ss]&nbsp;(-&gt;&gt;&nbsp;(rest&nbsp;arg)
+                </span><br/>
+<span class="covered" title="7 out of 7 forms covered">
+                116&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;#(str&nbsp;&quot;-&quot;&nbsp;%))
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                117&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;label+value-schemas))
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                118&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;interpolated-args&nbsp;()
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                119&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;argstail&nbsp;argstail]
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                120&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(nil?&nbsp;value-schema)
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                121&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(into&nbsp;argstail&nbsp;interpolated-args)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                122&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(recur&nbsp;ss
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                123&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(into&nbsp;(cons&nbsp;short-option&nbsp;interpolated-args)&nbsp;(take&nbsp;arg-number&nbsp;argstail))
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                124&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(drop&nbsp;arg-number&nbsp;argstail)))))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                125&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                126&nbsp;&nbsp;(defn&nbsp;break-long-option-and-value
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                127&nbsp;&nbsp;&nbsp;&nbsp;&quot;Expand&nbsp;an&nbsp;argument&nbsp;that&nbsp;contains&nbsp;both&nbsp;an&nbsp;option&nbsp;label&nbsp;and&nbsp;a&nbsp;value
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                128&nbsp;&nbsp;&nbsp;&nbsp;into&nbsp;two&nbsp;arguments:&nbsp;the&nbsp;label,&nbsp;and&nbsp;the&nbsp;value.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                129&nbsp;&nbsp;&nbsp;&nbsp;[arg&nbsp;argstail]
+                </span><br/>
+<span class="covered" title="8 out of 8 forms covered">
+                130&nbsp;&nbsp;&nbsp;&nbsp;(into&nbsp;(str&#x2F;split&nbsp;arg&nbsp;#&quot;=&quot;&nbsp;2)&nbsp;argstail))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                131&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                132&nbsp;&nbsp;(defn&nbsp;parse-args
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                133&nbsp;&nbsp;&nbsp;&nbsp;&quot;Entry&nbsp;point&nbsp;to&nbsp;the&nbsp;technical&nbsp;work&nbsp;of&nbsp;turning&nbsp;a&nbsp;sequence&nbsp;of&nbsp;arguments
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                134&nbsp;&nbsp;&nbsp;&nbsp;`args`&nbsp;into&nbsp;a&nbsp;map&nbsp;that&nbsp;(maybe)&nbsp;conforms&nbsp;to&nbsp;a&nbsp;`schema`.&nbsp;It&nbsp;returns&nbsp;a
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                135&nbsp;&nbsp;&nbsp;&nbsp;map&nbsp;of&nbsp;the&nbsp;options&nbsp;as&nbsp;parsed&nbsp;according&nbsp;to&nbsp;the&nbsp;schema,&nbsp;but&nbsp;with&nbsp;two
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                136&nbsp;&nbsp;&nbsp;&nbsp;additional&nbsp;keys:
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                137&nbsp;&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                138&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;`::operands`&nbsp;is&nbsp;a&nbsp;vector&nbsp;of&nbsp;application&nbsp;arguments,&nbsp;that&nbsp;is&nbsp;to&nbsp;say
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                139&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;command-line&nbsp;arguments&nbsp;that&nbsp;do&nbsp;not&nbsp;represent&nbsp;an&nbsp;option&nbsp;value.
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                140&nbsp;&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                141&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;`::cli-args`&nbsp;is&nbsp;the&nbsp;raw,&nbsp;untouched&nbsp;vector&nbsp;of&nbsp;command-line
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                142&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arguments&nbsp;received&nbsp;as&nbsp;input.&nbsp;Perhaps&nbsp;you&nbsp;need&nbsp;it&nbsp;for&nbsp;some
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                143&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;additional&nbsp;validation&nbsp;of&nbsp;positional&nbsp;logic.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                144&nbsp;&nbsp;&nbsp;&nbsp;[label+value-schemas&nbsp;args]
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                145&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;TODO&nbsp;Validate&nbsp;assumption&nbsp;on&nbsp;schema.
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                146&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;[options&nbsp;{}
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                147&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operands&nbsp;[]
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                148&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[arg&nbsp;&amp;&nbsp;argstail]&nbsp;args]
+                </span><br/>
+<span class="partial" title="8 out of 9 forms covered">
+                149&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                150&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(nil?&nbsp;arg)&nbsp;;&nbsp;Argument&nbsp;list&nbsp;to&nbsp;parse&nbsp;is&nbsp;exhausted
+                </span><br/>
+<span class="covered" title="5 out of 5 forms covered">
+                151&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assoc&nbsp;options
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                152&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::operands&nbsp;operands
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                153&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::cli-args&nbsp;args)
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                154&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                155&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(=&nbsp;posix&#x2F;option-terminator&nbsp;arg)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                156&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(recur&nbsp;options&nbsp;(into&nbsp;operands&nbsp;argstail)&nbsp;[])
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                157&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                158&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(gnu&#x2F;long-option-with-value?&nbsp;arg)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                159&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(recur&nbsp;options
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                160&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operands
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                161&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(break-long-option-and-value&nbsp;arg&nbsp;argstail))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                162&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="12 out of 12 forms covered">
+                163&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;(get&nbsp;label+value-schemas&nbsp;arg)
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                164&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(gnu&#x2F;long-option-without-value?&nbsp;arg)
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                165&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(posix&#x2F;single-option-without-value?&nbsp;arg)))
+                </span><br/>
+<span class="covered" title="9 out of 9 forms covered">
+                166&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[parsing-result&nbsp;(-parse-option&nbsp;(get&nbsp;label+value-schemas&nbsp;arg)&nbsp;options&nbsp;arg&nbsp;argstail)]
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                167&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(recur&nbsp;(.-options&nbsp;parsing-result)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                168&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operands
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                169&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(.-argstail&nbsp;parsing-result)))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                170&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="8 out of 8 forms covered">
+                171&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(gnu&#x2F;long-option-without-value?&nbsp;arg)
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                172&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(posix&#x2F;single-option-without-value?&nbsp;arg))
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                173&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(recur&nbsp;(-&gt;&nbsp;options
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                174&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(update&nbsp;::unknown-option-errors&nbsp;conj&nbsp;{:arg&nbsp;arg})
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                175&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(assoc&nbsp;::known-options&nbsp;(keys&nbsp;label+value-schemas)))
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                176&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operands
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                177&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;argstail)
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                178&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                179&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(posix&#x2F;grouped-options?&nbsp;arg)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                180&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(recur&nbsp;options
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                181&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operands
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                182&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(break-short-option-group&nbsp;label+value-schemas&nbsp;arg&nbsp;argstail))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                183&nbsp;&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                184&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:operand
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                185&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(recur&nbsp;options
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                186&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(conj&nbsp;operands&nbsp;arg)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                187&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;argstail))))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                188&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                189&nbsp;&nbsp;(def&nbsp;args-transformer
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                190&nbsp;&nbsp;&nbsp;&nbsp;&quot;The&nbsp;malli&nbsp;transformer&nbsp;wrapping&nbsp;`parse-args`.&nbsp;To&nbsp;be&nbsp;used&nbsp;it&nbsp;with
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                191&nbsp;&nbsp;&nbsp;&nbsp;`m&#x2F;decode`,&nbsp;wrapped&nbsp;by&nbsp;`mt&#x2F;transformer`.&nbsp;Merely&nbsp;turn&nbsp;a&nbsp;sequence&nbsp;of
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                192&nbsp;&nbsp;&nbsp;&nbsp;arguments&nbsp;`args`&nbsp;into&nbsp;a&nbsp;map&nbsp;that&nbsp;(maybe)&nbsp;conforms&nbsp;to&nbsp;a&nbsp;`schema`.&nbsp;You
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                193&nbsp;&nbsp;&nbsp;&nbsp;can&nbsp;compose&nbsp;this&nbsp;transformer&nbsp;to&nbsp;further&nbsp;refine&nbsp;command-line&nbsp;argument
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                194&nbsp;&nbsp;&nbsp;&nbsp;parsing.&nbsp;See&nbsp;`simple-cli-transformer`&nbsp;for&nbsp;an&nbsp;example.&quot;
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                195&nbsp;&nbsp;&nbsp;&nbsp;{:name&nbsp;:args-transformer
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                196&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:compile&nbsp;(fn&nbsp;[schema&nbsp;_]
+                </span><br/>
+<span class="covered" title="5 out of 5 forms covered">
+                197&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[label+value-schemas&nbsp;(-&gt;&gt;&nbsp;(m&#x27;&#x2F;value-schemas&nbsp;schema)
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                198&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(mapcat&nbsp;label+value-schema)
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                199&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(into&nbsp;{}))]
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                200&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fn&nbsp;[args]
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                201&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(parse-args&nbsp;label+value-schemas
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                202&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args))))})
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                203&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                204&nbsp;&nbsp;(def&nbsp;cli-transformer
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                205&nbsp;&nbsp;&nbsp;&nbsp;&quot;Use&nbsp;it&nbsp;for&nbsp;dumb,&nbsp;do-what-I-mean&nbsp;cli&nbsp;args&nbsp;parsing.&nbsp;Simple&nbsp;transformer
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                206&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;the&nbsp;most&nbsp;common&nbsp;use&nbsp;cases&nbsp;when&nbsp;you&nbsp;only&nbsp;want&nbsp;to&nbsp;get&nbsp;a&nbsp;(nested)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                207&nbsp;&nbsp;&nbsp;&nbsp;map&nbsp;of&nbsp;options&nbsp;out&nbsp;of&nbsp;command-line&nbsp;arguments:
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                208&nbsp;&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                209&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;`mt&#x2F;strip-extra-keys-transformer`&nbsp;will&nbsp;remove&nbsp;any&nbsp;extraneous&nbsp;keys;
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                210&nbsp;&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                211&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;`m&#x27;&#x2F;default-value-transformer`&nbsp;with&nbsp;`:env-var`&nbsp;injects&nbsp;environment
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                212&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;variables&nbsp;(read&nbsp;at&nbsp;decode&nbsp;time);
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                213&nbsp;&nbsp;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                214&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;`(mt&#x2F;default-value-transformer&nbsp;{:key&nbsp;:default})`&nbsp;fills&nbsp;the&nbsp;blank
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                215&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with&nbsp;default&nbsp;values&nbsp;when&nbsp;applicable.&quot;
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                216&nbsp;&nbsp;&nbsp;&nbsp;(mt&#x2F;transformer
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                217&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args-transformer
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                218&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mt&#x2F;strip-extra-keys-transformer&nbsp;;&nbsp;Remove&nbsp;it&nbsp;for&nbsp;debug,&nbsp;or&nbsp;more&nbsp;advanced&nbsp;usage.
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                219&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mt&#x2F;string-transformer
+                </span><br/>
+<span class="covered" title="7 out of 7 forms covered">
+                220&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(m&#x27;&#x2F;default-value-transformer&nbsp;{:key&nbsp;:env-var
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                221&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:default-fn&nbsp;#(System&#x2F;getenv&nbsp;%)})
+                </span><br/>
+<span class="covered" title="5 out of 5 forms covered">
+                222&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(mt&#x2F;default-value-transformer&nbsp;{:key&nbsp;:default})))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                223&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                224&nbsp;&nbsp;(defn&nbsp;start-with?
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                225&nbsp;&nbsp;&nbsp;&nbsp;&quot;Return&nbsp;true&nbsp;if&nbsp;the&nbsp;collection&nbsp;`path`&nbsp;starts&nbsp;with&nbsp;all&nbsp;the&nbsp;items&nbsp;of
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                226&nbsp;&nbsp;&nbsp;&nbsp;collection&nbsp;`prefix`.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                227&nbsp;&nbsp;&nbsp;&nbsp;[prefix&nbsp;path]
+                </span><br/>
+<span class="covered" title="8 out of 8 forms covered">
+                228&nbsp;&nbsp;&nbsp;&nbsp;(every?&nbsp;true?&nbsp;(map&nbsp;=&nbsp;prefix&nbsp;path)))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                229&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                230&nbsp;&nbsp;(defn&nbsp;prefix-shadowing
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                231&nbsp;&nbsp;&nbsp;&nbsp;[value-schemas]
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                232&nbsp;&nbsp;&nbsp;&nbsp;(loop&nbsp;[[{:keys&nbsp;[schema]&nbsp;:as&nbsp;head}&nbsp;&amp;&nbsp;tail]&nbsp;value-schemas
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                233&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;known-prefix?&nbsp;#{}
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                234&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remainder&nbsp;value-schemas]
+                </span><br/>
+<span class="covered" title="19 out of 19 forms covered">
+                235&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[prefix&nbsp;(some-&gt;&nbsp;schema&nbsp;m&#x2F;properties&nbsp;:summary-path)]
+                </span><br/>
+<span class="covered" title="8 out of 8 forms covered">
+                236&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond&nbsp;(nil?&nbsp;head)&nbsp;remainder
+                </span><br/>
+<span class="partial" title="8 out of 9 forms covered">
+                237&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(and&nbsp;prefix&nbsp;(known-prefix?&nbsp;prefix))&nbsp;(recur&nbsp;tail&nbsp;known-prefix?&nbsp;remainder)
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                238&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;prefix&nbsp;(recur&nbsp;tail
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                239&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(conj&nbsp;known-prefix?&nbsp;prefix)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                240&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(remove&nbsp;(comp&nbsp;(partial&nbsp;start-with?&nbsp;prefix)&nbsp;:path)&nbsp;remainder))
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                241&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:else&nbsp;(recur&nbsp;tail&nbsp;known-prefix?&nbsp;remainder)))))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                242&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                243&nbsp;&nbsp;(def&nbsp;summary-header
+                </span><br/>
+<span class="covered" title="5 out of 5 forms covered">
+                244&nbsp;&nbsp;&nbsp;&nbsp;[&quot;Short&quot;&nbsp;&quot;Long&nbsp;option&quot;&nbsp;&quot;Default&quot;&nbsp;&quot;Description&quot;])
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                245&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                246&nbsp;&nbsp;(defn&nbsp;default-value
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                247&nbsp;&nbsp;&nbsp;&nbsp;[value-schema]
+                </span><br/>
+<span class="partial" title="12 out of 13 forms covered">
+                248&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[default-&gt;str&nbsp;(or&nbsp;(-&gt;&nbsp;value-schema&nbsp;first&nbsp;second&nbsp;:default-&gt;str)
+                </span><br/>
+<span class="covered" title="9 out of 9 forms covered">
+                249&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fn&nbsp;[x]&nbsp;(when-not&nbsp;(nil?&nbsp;x)&nbsp;(pr-str&nbsp;x))))
+                </span><br/>
+<span class="covered" title="7 out of 7 forms covered">
+                250&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default&nbsp;(-&gt;&nbsp;value-schema&nbsp;first&nbsp;second&nbsp;:default)]
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                251&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(default-&gt;str&nbsp;default)))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                252&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                253&nbsp;&nbsp;(defn&nbsp;summary
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                254&nbsp;&nbsp;&nbsp;&nbsp;[schema]
+                </span><br/>
+<span class="covered" title="5 out of 5 forms covered">
+                255&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[short-option-name&nbsp;(comp&nbsp;first&nbsp;second)
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                256&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;long-option-name&nbsp;(comp&nbsp;first&nbsp;first)
+                </span><br/>
+<span class="covered" title="11 out of 11 forms covered">
+                257&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;description&nbsp;(comp&nbsp;#(-&gt;&gt;&nbsp;%&nbsp;:description&nbsp;(:summary&nbsp;%))&nbsp;second&nbsp;first)
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                258&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;summary-table&nbsp;(-&gt;&gt;&nbsp;(m&#x27;&#x2F;value-schemas&nbsp;schema)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                259&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;prefix-shadowing
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                260&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;label+value-schema)
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                261&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;All&nbsp;through&nbsp;`str`&nbsp;so&nbsp;that&nbsp;nil&nbsp;is&nbsp;rendered&nbsp;as&nbsp;empty&nbsp;string.
+                </span><br/>
+<span class="covered" title="8 out of 8 forms covered">
+                262&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(map&nbsp;(juxt&nbsp;(comp&nbsp;str&nbsp;short-option-name)
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                263&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(comp&nbsp;str&nbsp;long-option-name)
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                264&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(comp&nbsp;str&nbsp;default-value)
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                265&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(comp&nbsp;str&nbsp;description)))
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                266&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons&nbsp;summary-header))
+                </span><br/>
+<span class="covered" title="13 out of 13 forms covered">
+                267&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max-column-widths&nbsp;(reduce&nbsp;(fn&nbsp;[acc&nbsp;row]&nbsp;(map&nbsp;(partial&nbsp;max)&nbsp;(map&nbsp;count&nbsp;row)&nbsp;acc))
+                </span><br/>
+<span class="covered" title="3 out of 3 forms covered">
+                268&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(repeat&nbsp;0)
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                269&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;summary-table)]
+                </span><br/>
+<span class="covered" title="6 out of 6 forms covered">
+                270&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(str&#x2F;join&nbsp;&quot;\n&quot;&nbsp;(map&nbsp;(fn&nbsp;[v]
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                271&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;[fmt&nbsp;(-make-format&nbsp;max-column-widths)]
+                </span><br/>
+<span class="covered" title="6 out of 6 forms covered">
+                272&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(.stripTrailing&nbsp;^String&nbsp;(apply&nbsp;format&nbsp;fmt&nbsp;v))))
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                273&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;summary-table))))
+                </span><br/>
+ </body>
+</html>

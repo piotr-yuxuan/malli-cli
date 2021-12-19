@@ -1,0 +1,89 @@
+<html>
+ <head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="../../coverage.css"/>  <title> piotr_yuxuan/domain/posix.clj </title>
+ </head>
+ <body>
+<span class="covered" title="1 out of 1 forms covered">
+                001&nbsp;&nbsp;(ns&nbsp;piotr-yuxuan.domain.posix
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                002&nbsp;&nbsp;&nbsp;&nbsp;&quot;Option&nbsp;names&nbsp;are&nbsp;single&nbsp;alphanumeric&nbsp;characters&nbsp;(as&nbsp;for&nbsp;isalnum).&nbsp;For
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                003&nbsp;&nbsp;&nbsp;&nbsp;short&nbsp;options&nbsp;the&nbsp;space&nbsp;or&nbsp;equal&nbsp;character&nbsp;between&nbsp;option&nbsp;and&nbsp;an
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                004&nbsp;&nbsp;&nbsp;&nbsp;option&nbsp;argument&nbsp;is&nbsp;optional;&nbsp;also,&nbsp;several&nbsp;one-character&nbsp;option&nbsp;may
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                005&nbsp;&nbsp;&nbsp;&nbsp;be&nbsp;grouped&nbsp;after&nbsp;one&nbsp;hyphen.&quot;)
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                006&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                007&nbsp;&nbsp;(defn&nbsp;option?
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                008&nbsp;&nbsp;&nbsp;&nbsp;&quot;Arguments&nbsp;are&nbsp;options&nbsp;if&nbsp;they&nbsp;begin&nbsp;with&nbsp;a&nbsp;hyphen&nbsp;delimiter&nbsp;(&#x27;-&#x27;).&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                009&nbsp;&nbsp;&nbsp;&nbsp;[s]
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                010&nbsp;&nbsp;&nbsp;&nbsp;(re-find&nbsp;#&quot;^-\p{Alnum}{0,1}&quot;&nbsp;s))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                011&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                012&nbsp;&nbsp;(defn&nbsp;single-option?
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                013&nbsp;&nbsp;&nbsp;&nbsp;&quot;A&nbsp;option&nbsp;argument&nbsp;may&nbsp;follow&nbsp;the&nbsp;single-character&nbsp;option&nbsp;name.&nbsp;This
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                014&nbsp;&nbsp;&nbsp;&nbsp;can&nbsp;become&nbsp;rather&nbsp;counterintuitive&nbsp;with&nbsp;single-character&nbsp;option&nbsp;-.&quot;
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                015&nbsp;&nbsp;&nbsp;&nbsp;[s]
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                016&nbsp;&nbsp;&nbsp;&nbsp;(re-find&nbsp;#&quot;^-\p{Alnum}{0,1}&quot;&nbsp;s))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                017&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                018&nbsp;&nbsp;(defn&nbsp;single-option-without-value?
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                019&nbsp;&nbsp;&nbsp;&nbsp;[s]
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                020&nbsp;&nbsp;&nbsp;&nbsp;(re-find&nbsp;#&quot;^-\p{Alnum}{0,1}$&quot;&nbsp;s))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                021&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="1 out of 1 forms covered">
+                022&nbsp;&nbsp;(defn&nbsp;grouped-options?
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                023&nbsp;&nbsp;&nbsp;&nbsp;[s]
+                </span><br/>
+<span class="covered" title="4 out of 4 forms covered">
+                024&nbsp;&nbsp;&nbsp;&nbsp;(re-find&nbsp;#&quot;(?&lt;=^-{1})\p{Alnum}{2,}&quot;&nbsp;s))
+                </span><br/>
+<span class="blank" title="0 out of 0 forms covered">
+                025&nbsp;&nbsp;
+                </span><br/>
+<span class="covered" title="2 out of 2 forms covered">
+                026&nbsp;&nbsp;(def&nbsp;option-terminator
+                </span><br/>
+<span class="not-tracked" title="0 out of 0 forms covered">
+                027&nbsp;&nbsp;&nbsp;&nbsp;&quot;--&quot;)
+                </span><br/>
+ </body>
+</html>
