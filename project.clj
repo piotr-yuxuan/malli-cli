@@ -13,7 +13,7 @@
   :profiles {:github {:github/topics ["cli" "clojure" "command-line" "cli-app"
                                       "command-line-tool" "args-parser" "malli"]}
              :provided {:dependencies [[org.clojure/clojure "1.10.3"]
-                                       [metosin/malli "0.7.4"]]}
+                                       [metosin/malli "0.7.5"]]}
              :dev {:global-vars {*warn-on-reflection* true}
                    :dependencies [[camel-snake-kebab "0.4.2"]]}
              :jar {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=false"
