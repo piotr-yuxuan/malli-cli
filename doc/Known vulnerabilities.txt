@@ -1,0 +1,7 @@
+Checking dependencies for stdin  ...
+  using nvd-clojure:  and dependency-check: 6.5.1
+
+0 vulnerabilities detected. Severity: NONE
+Detailed reports saved in: /home/runner/work/malli-cli/malli-cli/target/nvd
+
+   *** THIS REPORT IS WITHOUT WARRANTY ***
