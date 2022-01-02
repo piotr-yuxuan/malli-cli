@@ -13,16 +13,21 @@
        (remove (comp #{:map} m/type :schema))))
 
 (defn default-value-transformer
+  "Copied from [[malli.transform/default-value-transformer]], doesn't
+  change existing behaviour but only add `default-fn` optional
+  argument. When set, this function takes one argument: the default
+  value found under key `key` (which defaults to `:default`). It is
+  called at transformer run time, not compile time."
   ([]
    (default-value-transformer nil))
-  ([{:keys [key defaults] :or {key :default}}]
+  ([{:keys [key default-fn defaults] :or {key :default, default-fn identity}}]
    (let [get-default (fn [schema]
                        (if-some [e (some-> schema m/properties (find key))]
                          (constantly (val e))
                          (some->> schema m/type (get defaults) (#(constantly (% schema))))))
          set-default {:compile (fn [schema _]
                                  (when-some [f (get-default schema)]
-                                   (fn [x] (if (nil? x) (f) x))))}
+                                   (fn [x] (if (nil? x) (default-fn (f)) x))))}
          add-defaults {:compile (fn [schema _]
                                   (let [defaults (into {}
                                                        (keep (fn [[k {:keys [optional] :as p} v]]
@@ -31,7 +36,7 @@
                                                                    (when-some [f (if e
                                                                                    (constantly (val e))
                                                                                    (get-default v))]
-                                                                     [k f])))))
+                                                                     [k (comp default-fn f)])))))
                                                        (m/children schema))]
                                     (when (seq defaults)
                                       (fn [x]
