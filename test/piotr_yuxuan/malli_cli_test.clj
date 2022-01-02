@@ -245,21 +245,32 @@
             :database "http://localhost:8888",
             :async-parallelism 64,
             :create-market-dataset false})))
-  (testing "environment variables"
-    (let [env {"CORP_UPLOAD_API" "https://api.upload-big-corp.com/data"}
-          transformer (mt/transformer
-                        (mt/transformer
-                          malli-cli/args-transformer
-                          mt/strip-extra-keys-transformer
-                          ;; Custom default-fn for env vars.
-                          (m'/default-value-transformer {:key :env-var
-                                                         :default-fn env})))]
-      (let [cli-args []]
-        (is (= (m/decode MyCliSchema cli-args transformer)
-               {:upload-api "https://api.upload-big-corp.com/data"})))
-      (let [cli-args ["-a" "https://mock"]]
-        (is (= (m/decode MyCliSchema cli-args transformer)
-               {:upload-api "https://mock"}))))))
+  (testing "environment variables: cli options will be looked up, then env var, then default."
+    (testing "value from cli options"
+      (let [cli-args ["--upload-api" "http://test.mock"]]
+        (is (= (binding [malli-cli/*system-get-env* (constantly {"CORP_UPLOAD_API" "https://api.upload-big-corp.com/data"})]
+                 (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-transformer)))
+               {:upload-api "http://test.mock",
+                :help false,
+                :database "http://localhost:8888",
+                :async-parallelism 64,
+                :create-market-dataset false}))))
+    (testing "value from env var"
+      (is (= (binding [malli-cli/*system-get-env* (constantly {"CORP_UPLOAD_API" "https://api.upload-big-corp.com/data"})]
+               (m/decode MyCliSchema [] (mt/transformer malli-cli/cli-transformer)))
+             {:upload-api "https://api.upload-big-corp.com/data",
+              :help false,
+              :database "http://localhost:8888",
+              :async-parallelism 64,
+              :create-market-dataset false})))
+    (testing "value from defaults"
+      (is (= (binding [malli-cli/*system-get-env* (constantly {})]
+               (m/decode MyCliSchema [] (mt/transformer malli-cli/cli-transformer)))
+             {:upload-api "http://localhost:8080",
+              :help false,
+              :database "http://localhost:8888",
+              :async-parallelism 64,
+              :create-market-dataset false})))))
 
 (deftest error-test
   (let [cli-args ["--unknown-long-option" "--my-option" "VALUE" "-s"]]

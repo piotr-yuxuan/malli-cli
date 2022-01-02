@@ -201,6 +201,10 @@
                   (parse-args label+value-schemas
                               args))))})
 
+(defn ^:dynamic *system-get-env*
+  []
+  (System/getenv))
+
 (def cli-transformer
   "Use it for dumb, do-what-I-mean cli args parsing. Simple transformer
   for the most common use cases when you only want to get a (nested)
@@ -218,7 +222,7 @@
     mt/strip-extra-keys-transformer ; Remove it for debug, or more advanced usage.
     mt/string-transformer
     (m'/default-value-transformer {:key :env-var
-                                   :default-fn #(System/getenv %)})
+                                   :default-fn #(get (*system-get-env*) %)})
     (m'/default-value-transformer {:key :default})))
 
 (defn start-with?
