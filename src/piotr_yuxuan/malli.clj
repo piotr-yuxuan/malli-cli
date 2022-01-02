@@ -13,38 +13,33 @@
        (remove (comp #{:map} m/type :schema))))
 
 (defn default-value-transformer
-  "Copied from `malli.transform/default-value-transformer`, doesn't
-  change existing behaviour but only add `default-fn` optional
-  argument. When set, this function is applied on the default value
-  found under key `key`."
   ([]
    (default-value-transformer nil))
-  ([{:keys [key default-fn defaults] :or {key :default, default-fn identity}}]
+  ([{:keys [key defaults] :or {key :default}}]
    (let [get-default (fn [schema]
-                       (if-some [default (some-> schema m/properties key)]
-                         default
-                         (some->> schema m/type (get defaults) (#(% schema)))))
+                       (if-some [e (some-> schema m/properties (find key))]
+                         (constantly (val e))
+                         (some->> schema m/type (get defaults) (#(constantly (% schema))))))
          set-default {:compile (fn [schema _]
-                                 (when-some [default (get-default schema)]
-                                   (fn [x] (if (nil? x) default x))))}
+                                 (when-some [f (get-default schema)]
+                                   (fn [x] (if (nil? x) (f) x))))}
          add-defaults {:compile (fn [schema _]
                                   (let [defaults (into {}
-                                                       (keep (fn [[k {default key :keys [optional]} v]]
+                                                       (keep (fn [[k {:keys [optional] :as p} v]]
                                                                (when-not optional
-                                                                 (when-some [default (if (some? default)
-                                                                                       default
-                                                                                       (get-default v))]
-                                                                   [k default]))))
+                                                                 (let [e (find p key)]
+                                                                   (when-some [f (if e
+                                                                                   (constantly (val e))
+                                                                                   (get-default v))]
+                                                                     [k f])))))
                                                        (m/children schema))]
                                     (when (seq defaults)
                                       (fn [x]
                                         (if (map? x)
                                           (reduce-kv
-                                            (fn [acc k v]
+                                            (fn [acc k f]
                                               (if-not (contains? x k)
-                                                (if-let [d (default-fn v)]
-                                                  (assoc acc k d)
-                                                  acc)
+                                                (assoc acc k (f))
                                                 acc))
                                             x defaults)
                                           x)))))}]
