@@ -50,7 +50,7 @@ The utility in the example is named `utility_name`. It is followed by
 options, option-arguments, and operands. The arguments that consist of
 `-` characters and single letters or digits, such as `a`, are known as
 "options" (or, historically, "flags"). Certain options are followed by
-an "option-argument", as shown with `[ -c option_argument]`. The
+an "option-argument", as shown with `[ -c option_argument ]`. The
 arguments following the last options and option-arguments are named
 "operands".
 
