@@ -99,7 +99,7 @@
 ✔         (and update-fn arg-number) (ParsingResult. (update-fn options value-schema (take arg-number argstail))
 ✔                                                    (drop arg-number argstail))
 ✔         (zero? arg-number) (ParsingResult. (assoc-in options in true)
-✔                                          argstail)
+✔                                            argstail)
 ✔         (= 1 arg-number) (ParsingResult. (assoc-in options in (first argstail))
 ✔                                          (rest argstail))
 ✔         (number? arg-number) (ParsingResult. (assoc-in options in (vec (take arg-number argstail)))
@@ -201,6 +201,10 @@
 ✔                   (parse-args label+value-schemas
 ✔                               args))))})
   
+✔ (defn ^:dynamic *system-get-env*
+?   []
+✔   (System/getenv))
+  
 ✔ (def cli-transformer
 ?   "Use it for dumb, do-what-I-mean cli args parsing. Simple transformer
 ?   for the most common use cases when you only want to get a (nested)
@@ -211,15 +215,15 @@
 ?   - `m'/default-value-transformer` with `:env-var` injects environment
 ?     variables (read at decode time);
   
-?   - `(mt/default-value-transformer {:key :default})` fills the blank
+?   - `(m'/default-value-transformer {:key :default})` fills the blank
 ?     with default values when applicable."
 ✔   (mt/transformer
 ✔     args-transformer
 ✔     mt/strip-extra-keys-transformer ; Remove it for debug, or more advanced usage.
 ✔     mt/string-transformer
 ✔     (m'/default-value-transformer {:key :env-var
-✔                                    :default-fn #(System/getenv %)})
-✔     (mt/default-value-transformer {:key :default})))
+✔                                    :default-fn #(get (*system-get-env*) %)})
+✔     (m'/default-value-transformer {:key :default})))
   
 ✔ (defn start-with?
 ?   "Return true if the collection `path` starts with all the items of
