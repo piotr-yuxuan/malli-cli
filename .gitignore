@@ -7,7 +7,6 @@
 /.nrepl-history
 /.nrepl-port
 /*.asc
-/pom.xml
 *.iml
 */.lein-*
 */.nrepl-port
