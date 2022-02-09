@@ -27,4 +27,4 @@ perf/.terraform*
 perf/.terraform/**
 perf/terraform*
 pom.xml.asc
-target/
+target//pom.xml
