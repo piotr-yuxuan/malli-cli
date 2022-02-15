@@ -13,12 +13,12 @@
   :profiles {:github {:github/topics ["cli" "clojure" "command-line" "cli-app"
                                       "command-line-tool" "args-parser" "malli"]}
              :provided {:dependencies [[org.clojure/clojure "1.10.3"]
-                                       [metosin/malli "0.8.2"]]}
+                                       [metosin/malli "0.8.3"]]}
              :dev {:global-vars {*warn-on-reflection* true}
                    :dependencies [[camel-snake-kebab "0.4.2"]]}
              :jar {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=false"
                               "-Dclojure.compiler.direct-linking=true"]}
-             :kaocha [:test {:dependencies [[lambdaisland/kaocha "1.62.993"]]}]}
+             :kaocha [:test {:dependencies [[lambdaisland/kaocha "1.63.998"]]}]}
   :deploy-repositories [["clojars" {:sign-releases false
                                     :url "https://clojars.org/repo"
                                     :username :env/WALTER_CLOJARS_USERNAME
