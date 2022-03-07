@@ -1,4 +1,4 @@
-(ns piotr-yuxuan.domain.gnu)
+(ns piotr-yuxuan.malli-cli.domain.gnu)
 
 (defn long-option?
   [s]

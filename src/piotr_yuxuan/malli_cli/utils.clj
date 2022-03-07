@@ -1,4 +1,4 @@
-(ns piotr-yuxuan.utils
+(ns piotr-yuxuan.malli-cli.utils
   "General functions and utilities that could be part of clojure standard library, but aren't."
   (:require [clojure.string :as str]))
 

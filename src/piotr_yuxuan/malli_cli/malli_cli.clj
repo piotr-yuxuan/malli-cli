@@ -1,8 +1,8 @@
-(ns piotr-yuxuan.malli-cli
-  (:require [piotr-yuxuan.domain.gnu :as gnu]
-            [piotr-yuxuan.domain.posix :as posix]
-            [piotr-yuxuan.malli :as m']
-            [piotr-yuxuan.utils :refer [remove-key -make-format]]
+(ns piotr-yuxuan.malli-cli.malli-cli
+  (:require [piotr-yuxuan.malli-cli.domain.gnu :as gnu]
+            [piotr-yuxuan.malli-cli.domain.posix :as posix]
+            [piotr-yuxuan.malli-cli.malli :as m']
+            [piotr-yuxuan.malli-cli.utils :refer [remove-key -make-format]]
             [clojure.string :as str]
             [malli.core :as m]
             [malli.transform :as mt])

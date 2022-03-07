@@ -1,4 +1,4 @@
-(ns piotr-yuxuan.domain.posix
+(ns piotr-yuxuan.malli-cli.domain.posix
   "Option names are single alphanumeric characters (as for isalnum). For
   short options the space or equal character between option and an
   option argument is optional; also, several one-character option may

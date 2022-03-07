@@ -1,4 +1,4 @@
-(ns piotr-yuxuan.malli
+(ns piotr-yuxuan.malli-cli.malli
   "Functions or overloaded functions that could be part of malli, but aren't (as of now)."
   (:require [malli.core :as m]
             [malli.transform :as mt]
