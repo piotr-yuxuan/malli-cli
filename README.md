@@ -165,7 +165,7 @@ command-line interface from it.
 (require '[piotr-yuxuan.malli-cli :as malli-cli])
 (require '[malli.core :as m])
 (require '[clojure.pprint])
-(require '[piotr-yuxuan.utils :refer [deep-merge]])
+(require '[piotr-yuxuan.malli-cli.utils :refer [deep-merge]])
 
 (defn load-config
   [args]
