@@ -1,6 +1,6 @@
 Lines Non-Blank Instrumented Covered Partial
-   27        22           10      10       0 piotr_yuxuan/domain/posix.clj
-   13        10            7       7       0 piotr_yuxuan/domain/gnu.clj
-   31        28           10       5       1 piotr_yuxuan/utils.clj
-   55        53           39      33       3 piotr_yuxuan/malli.clj
+   27        22           10      10       0 piotr_yuxuan/malli_cli/domain/posix.clj
+   13        10            7       7       0 piotr_yuxuan/malli_cli/domain/gnu.clj
+   31        28           10       5       1 piotr_yuxuan/malli_cli/utils.clj
+   12        11            5       5       0 piotr_yuxuan/malli_cli/malli.clj
   277       245          149     138       8 piotr_yuxuan/malli_cli.clj

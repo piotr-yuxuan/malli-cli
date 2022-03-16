@@ -1,8 +1,8 @@
 ✔ (ns piotr-yuxuan.malli-cli
-?   (:require [piotr-yuxuan.domain.gnu :as gnu]
-?             [piotr-yuxuan.domain.posix :as posix]
-?             [piotr-yuxuan.malli :as m']
-?             [piotr-yuxuan.utils :refer [remove-key -make-format]]
+?   (:require [piotr-yuxuan.malli-cli.domain.gnu :as gnu]
+?             [piotr-yuxuan.malli-cli.domain.posix :as posix]
+?             [piotr-yuxuan.malli-cli.malli :as m']
+?             [piotr-yuxuan.malli-cli.utils :refer [remove-key -make-format]]
 ?             [clojure.string :as str]
 ?             [malli.core :as m]
 ?             [malli.transform :as mt])
@@ -221,9 +221,9 @@
 ✔     args-transformer
 ✔     mt/strip-extra-keys-transformer ; Remove it for debug, or more advanced usage.
 ✔     mt/string-transformer
-✔     (m'/default-value-transformer {:key :env-var
-✔                                    :default-fn #(get (*system-get-env*) %)})
-✔     (m'/default-value-transformer {:key :default})))
+✔     (mt/default-value-transformer {:key :env-var
+✔                                    :default-fn #(get (*system-get-env*) %2)})
+✔     (mt/default-value-transformer {:key :default})))
   
 ✔ (defn start-with?
 ?   "Return true if the collection `path` starts with all the items of
