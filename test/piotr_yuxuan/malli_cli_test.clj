@@ -4,7 +4,7 @@
             [malli.core :as m]
             [malli.transform :as mt]
             [malli.util :as mu]
-            [piotr-yuxuan.malli :as m']))
+            [piotr-yuxuan.malli-cli.malli :as m']))
 
 (deftest children-successor-test
   (is (= (malli-cli/children-successor [:enum :a :b :c :d])

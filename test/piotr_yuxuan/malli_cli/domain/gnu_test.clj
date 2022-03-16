@@ -1,6 +1,6 @@
-(ns piotr-yuxuan.domain.gnu-test
+(ns piotr-yuxuan.malli-cli.domain.gnu-test
   (:require [clojure.test :refer [deftest testing is]]
-            [piotr-yuxuan.domain.gnu :as gnu]))
+            [piotr-yuxuan.malli-cli.domain.gnu :as gnu]))
 
 (deftest long-option?-test
   (testing "Argument"

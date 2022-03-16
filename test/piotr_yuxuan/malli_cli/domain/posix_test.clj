@@ -1,6 +1,6 @@
-(ns piotr-yuxuan.domain.posix-test
+(ns piotr-yuxuan.malli-cli.domain.posix-test
   (:require [clojure.test :refer [deftest testing is]]
-            [piotr-yuxuan.domain.posix :as posix]))
+            [piotr-yuxuan.malli-cli.domain.posix :as posix]))
 
 (deftest option?-test
   (testing "Arguments"

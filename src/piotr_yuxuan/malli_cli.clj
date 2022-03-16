@@ -1,4 +1,4 @@
-(ns piotr-yuxuan.malli-cli.malli-cli
+(ns piotr-yuxuan.malli-cli
   (:require [piotr-yuxuan.malli-cli.domain.gnu :as gnu]
             [piotr-yuxuan.malli-cli.domain.posix :as posix]
             [piotr-yuxuan.malli-cli.malli :as m']
