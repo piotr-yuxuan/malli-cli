@@ -391,5 +391,5 @@ the environment being constant and set by the JVM at start-up time.
 # References
 
 - [GNU Program Argument Syntax Conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html)
-- [POSIX.1-2017 Utility argument syntax](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html)"
+- [POSIX.1-2017 Utility argument syntax](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html)
 - https://github.com/l3nz/cli-matic is a similar, more established project.
