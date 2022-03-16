@@ -4,7 +4,7 @@
   <groupId>com.github.piotr-yuxuan</groupId>
   <artifactId>malli-cli</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.3</version>
+  <version>2.0.0</version>
   <name>malli-cli</name>
   <description>Command-line interface from the comfort of a metosin/malli schema</description>
   <url>https://github.com/piotr-yuxuan/malli-cli</url>
@@ -19,7 +19,7 @@
     <url>https://github.com/piotr-yuxuan/malli-cli</url>
     <connection>scm:git:git://github.com/piotr-yuxuan/malli-config-cli.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/piotr-yuxuan/malli-config-cli.git</developerConnection>
-    <tag>21f14506e19dcd4242909b538ef400acb6bbc2d3</tag>
+    <tag>e5162c11d578c21b74f421a0361ba3b0c0d1659c</tag>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -73,7 +73,7 @@
     <dependency>
       <groupId>metosin</groupId>
       <artifactId>malli</artifactId>
-      <version>0.8.1</version>
+      <version>0.8.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
