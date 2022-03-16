@@ -273,5 +273,5 @@
                                   summary-table)]
     (str/join "\n" (map (fn [v]
                           (let [fmt (-make-format max-column-widths)]
-                            (.stripTrailing ^String (apply format fmt v))))
+                            (str/trimr (apply format fmt v))))
                         summary-table))))
