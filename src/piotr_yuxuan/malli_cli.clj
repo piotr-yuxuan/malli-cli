@@ -221,9 +221,9 @@
     args-transformer
     mt/strip-extra-keys-transformer ; Remove it for debug, or more advanced usage.
     mt/string-transformer
-    (m'/default-value-transformer {:key :env-var
-                                   :default-fn #(get (*system-get-env*) %)})
-    (m'/default-value-transformer {:key :default})))
+    (mt/default-value-transformer {:key :env-var
+                                   :default-fn #(get (*system-get-env*) %2)})
+    (mt/default-value-transformer {:key :default})))
 
 (defn start-with?
   "Return true if the collection `path` starts with all the items of
