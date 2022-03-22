@@ -12,7 +12,7 @@
   :dependencies []
   :profiles {:github {:github/topics ["cli" "clojure" "command-line" "cli-app"
                                       "command-line-tool" "args-parser" "malli"]}
-             :provided {:dependencies [[org.clojure/clojure "1.10.3"]
+             :provided {:dependencies [[org.clojure/clojure "1.11.0"]
                                        [metosin/malli "0.8.4"]]}
              :dev {:global-vars {*warn-on-reflection* true}
                    :dependencies [[camel-snake-kebab "0.4.2"]]}
