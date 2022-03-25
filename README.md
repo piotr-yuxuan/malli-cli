@@ -4,6 +4,7 @@
 
 Command-line interface with malli.
 
+[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/malli-cli/Walter%20CD)](https://github.com/piotr-yuxuan/malli-cli/actions/workflows/walter-cd.yml)
 [![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/malli-cli.svg)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
 [![Clojars downloads](https://img.shields.io/clojars/dt/com.github.piotr-yuxuan/malli-cli)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
 [![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/malli-cli)](https://cljdoc.org/d/com.github.piotr-yuxuan/malli-cli/CURRENT)
