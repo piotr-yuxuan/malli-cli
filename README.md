@@ -1,33 +1,9 @@
-# Portfolio
+# `piotr-yuxuan/malli-cli`
 
-Here are some side projects I care about 🙂, simply laid down in a gist #KISS #simplicity. Also see [resume.github.io](http://resume.github.io/?piotr-yuxuan). Most of my projects are visible on [GitHub](https://github.com/piotr-yuxuan). In case you'd like to get in touch, go on [Twitter](https://twitter.com/PiotrYuxuan).
+![](./doc/controller.jpg)
 
-![](https://media-exp1.licdn.com/dms/image/C4D16AQElRn2O25slaQ/profile-displaybackgroundimage-shrink_350_1400/0/1635962001469?e=1653523200&v=beta&t=dZXRrwbVZ_dHN_KSqpAQg2a-0u4EvPdtiul1_f9HJvM)
+Command-line interface with malli.
 
-<details>
-<summary> Expand to see more.
-
-> _WIP, portfolio being updated as of April 2022_
-
-</summary>
-
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/security-mining/main/doc/social-preview.jpg">  Personal investment on best securities (from February 2022)
-
-https://github.com/piotr-yuxuan/security-mining
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/security-mining)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/security-mining/Walter%20CD)](https://github.com/piotr-yuxuan/security-mining/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/security-mining.svg)](https://clojars.org/com.github.piotr-yuxuan/security-mining)
-[![Clojars downloads](https://img.shields.io/clojars/dt/piotr-yuxuan/security-mining)](https://clojars.org/com.github.piotr-yuxuan/security-mining)
-[![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/security-mining)](https://cljdoc.org/d/com.github.piotr-yuxuan/security-mining/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/security-mining)](https://github.com/piotr-yuxuan/security-mining/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/security-mining)](https://github.com/piotr-yuxuan/security-mining/issues)
-
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/malli-cli/main/doc/controller.jpg"> Simple CLI apps from a config schema (from June 2021)
-
-https://github.com/piotr-yuxuan/malli-cli
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/malli-cli)
 [![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/malli-cli/Walter%20CD)](https://github.com/piotr-yuxuan/malli-cli/actions/workflows/walter-cd.yml)
 [![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/malli-cli.svg)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
 [![Clojars downloads](https://img.shields.io/clojars/dt/com.github.piotr-yuxuan/malli-cli)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
@@ -35,198 +11,386 @@ https://github.com/piotr-yuxuan/malli-cli
 [![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
 
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/walter-ci/main/doc/helmut-kohl-1.jpg"> CICD automation for my personal projects (from April 2021)
-
-https://github.com/piotr-yuxuan/walter-ci
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/walter-ci)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/walter-ci/Walter%20CD)](https://github.com/piotr-yuxuan/walter-ci/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/walter-ci.svg)](https://clojars.org/com.github.piotr-yuxuan/walter-ci)
-[![Clojars downloads](https://img.shields.io/clojars/dt/com.github.piotr-yuxuan/walter-ci)](https://clojars.org/com.github.piotr-yuxuan/walter-ci)
-[![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/walter-ci)](https://cljdoc.org/d/com.github.piotr-yuxuan/walter-ci/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/walter-ci)](https://github.com/piotr-yuxuan/walter-ci/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/walter-ci)](https://github.com/piotr-yuxuan/walter-ci/issues)
-
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/ephemeral-server/main/doc/ephemeral-server.jpg"> Catching test HTTP calls without DockerContainer (from April 2021)
-
-https://github.com/piotr-yuxuan/ephemeral-server
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/ephemeral-server)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/ephemeral-server/Walter%20CD)](https://github.com/piotr-yuxuan/ephemeral-server/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/piotr-yuxuan/ephemeral-server.svg)](https://clojars.org/piotr-yuxuan/ephemeral-server)
-[![Clojars downloads](https://img.shields.io/clojars/dt/piotr-yuxuan/ephemeral-server)](https://clojars.org/piotr-yuxuan/ephemeral-server)
-[![cljdoc badge](https://cljdoc.org/badge/piotr-yuxuan/ephemeral-server)](https://cljdoc.org/d/piotr-yuxuan/ephemeral-server/0.3.0/doc/readme)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/ephemeral-server)](https://github.com/piotr-yuxuan/ephemeral-server/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/ephemeral-server)](https://github.com/piotr-yuxuan/ephemeral-server/issues)
-
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/poor-mans-distributed-cache/main/doc/Diogenes.png"> Using KTable as a distributed cache (from March 2021)
-
-https://github.com/piotr-yuxuan/poor-mans-distributed-cache
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/poor-mans-distributed-cache)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/poor-mans-distributed-cache/Walter%20CD)](https://github.com/piotr-yuxuan/poor-mans-distributed-cache/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/poor-mans-distributed-cache.svg)](https://clojars.org/com.github.piotr-yuxuan/poor-mans-distributed-cache)
-[![Clojars downloads](https://img.shields.io/clojars/dt/piotr-yuxuan/poor-mans-distributed-cache)](https://clojars.org/com.github.piotr-yuxuan/poor-mans-distributed-cache)
-[![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/poor-mans-distributed-cache)](https://cljdoc.org/d/com.github.piotr-yuxuan/poor-mans-distributed-cache/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/poor-mans-distributed-cache)](https://github.com/piotr-yuxuan/poor-mans-distributed-cache/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/poor-mans-distributed-cache)](https://github.com/piotr-yuxuan/poor-mans-distributed-cache/issues)
-
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/closeable-map/main/doc/automatische-huehnerklappe.jpg"> State management with a `java.io.Closeable` Clojure map (from Feb 2021)
-
-https://github.com/piotr-yuxuan/closeable-map
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/closeable-map)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/closeable-map/Walter%20CD)](https://github.com/piotr-yuxuan/closeable-map/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/piotr-yuxuan/closeable-map.svg)](https://clojars.org/piotr-yuxuan/closeable-map)
-[![Clojars downloads](https://img.shields.io/clojars/dt/piotr-yuxuan/closeable-map)](https://clojars.org/piotr-yuxuan/closeable-map)
-[![cljdoc badge](https://cljdoc.org/badge/piotr-yuxuan/closeable-map)](https://cljdoc.org/d/piotr-yuxuan/closeable-map/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/closeable-map)](https://github.com/piotr-yuxuan/closeable-map/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/closeable-map)](https://github.com/piotr-yuxuan/closeable-map/issues)
-
-</details>
-
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/algo-calisthenics/ef6bcf7de3f719010e88b6cf67d630bf8bee192d/social-media-preview.jpeg"> Algorithms and datastructures calisthenics (from Sept 2019)
-
-https://github.com/piotr-yuxuan/algo-calisthenics
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/algo-calisthenics)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/algo-calisthenics/Walter%20CD)](https://github.com/piotr-yuxuan/algo-calisthenics/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/piotr-yuxuan/algo-calisthenics.svg)](https://clojars.org/com.github.piotr-yuxuan/algo-calisthenics)
-[![Clojars downloads](https://img.shields.io/clojars/dt/piotr-yuxuan/algo-calisthenics)](https://clojars.org/com.github.piotr-yuxuan/algo-calisthenics)
-[![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/algo-calisthenics)](https://cljdoc.org/d/com.github.piotr-yuxuan/algo-calisthenics/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/algo-calisthenics)](https://github.com/piotr-yuxuan/algo-calisthenics/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/algo-calisthenics)](https://github.com/piotr-yuxuan/algo-calisthenics/issues)
-
-This is where I would put some of my training exercises when the problems looks peculiarly fun, and interesting to solve. Algorithmic questions asked in coding interviews will probably be similar to code here.
-
-Nevertheless I shall add I'm always a bit disappointed by coding interviews where the job seeker is only given some riddles to solve quickly. It's a microscopic part of amy daily engineering work which ought to involve reasoning about the long-term technical vision to serve the business of the company, being cognizant about the platform observability, resilience, and robustness, and friendly rubbing shoulders with other team mates.
-
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/slava/main/dev-resources/%D1%81%D0%BB%D0%B0%D0%B2%D0%B0-%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D1%81%D0%BA%D0%BE%D0%BC%D1%83-%D0%BD%D0%B0%D1%80%D0%BE%D0%B4%D1%83.jpg"> Avro codec and serde for Kafka Streams applications (from April 2019)
-
-https://github.com/piotr-yuxuan/slava
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/slava)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/slava/Walter%20CD)](https://github.com/piotr-yuxuan/slava/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/piotr-yuxuan/slava.svg)](https://clojars.org/piotr-yuxuan/slava)
-[![Clojars downloads](https://img.shields.io/clojars/dt/piotr-yuxuan/slava)](https://clojars.org/piotr-yuxuan/slava)
-[![cljdoc badge](https://cljdoc.org/badge/piotr-yuxuan/slava)](https://cljdoc.org/d/piotr-yuxuan/slava/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/slava)](https://github.com/piotr-yuxuan/slava/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/slava)](https://github.com/piotr-yuxuan/slava/issues)
-
-> _WIP, portfolio being updated as of April 2022_
-
-## <img display="inline" height="25em" src="https://raw.githubusercontent.com/piotr-yuxuan/dove/main/resources/avro.jpg"> Generative testing from org.apache.avro.Schema (from Feb 2019)
-
-https://github.com/piotr-yuxuan/dove
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/dove)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/dove/Walter%20CD)](https://github.com/piotr-yuxuan/dove/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/dove/dove.svg)](https://clojars.org/dove/dove)
-[![Clojars downloads](https://img.shields.io/clojars/dt/dove/dove)](https://clojars.org/dove/dove)
-[![cljdoc badge](https://cljdoc.org/badge/dove/dove)](https://cljdoc.org/d/dove/dove/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/dove)](https://github.com/piotr-yuxuan/dove/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/dove)](https://github.com/piotr-yuxuan/dove/issues)
-
-Apache Avro is a way to serialize data in binary according to some schema which describes the data shapes from (nested) primitive types. I figured out it would be pretty useful to generate random sample of Avro messages corresponding to a schema. Using clojure.spec, test.check, and some Java interop, code turns out to be pretty concise.
-
-This is an example of emerging design, exemplifying Eisenhower sentence: « plans are useless, but planning is indispensable ». I had a strong idea of what I need, I knew Clojure protocol would a suitable implementation choice, but I started from a white sheet and let the code click flow itself in the simplest way while I iteratively added new features and constraints.
-
-Not the whole Apache Avro spec is implemented but I aim at making this side project useful for my main employer usecase.
-
-## Nabab : Describe how data flow between core.async channels with a pinch of syntactic sugar (from Oct 2018)
-
-https://github.com/piotr-yuxuan/nabab
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/nabab)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/nabab/Walter%20CD)](https://github.com/piotr-yuxuan/nabab/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/nabab.svg)](https://clojars.org/com.github.piotr-yuxuan/nabab)
-[![Clojars downloads](https://img.shields.io/clojars/dt/nabab)](https://clojars.org/com.github.piotr-yuxuan/nabab)
-[![cljdoc badge](https://cljdoc.org/badge/nabab)](https://cljdoc.org/d/nabab/nabab)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/nabab)](https://github.com/piotr-yuxuan/nabab/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/nabab)](https://github.com/piotr-yuxuan/nabab/issues)
-
-- Early example of emerging design with a focus on simplicity and decomplection. I chose name Nabab in order to keep remembering me I don't want an abstraction above core.async, merely a side tooling.
-- Example of litterate programming with Emacs.
-- Inspiration from this project come from Prismatic plumbing graph,
-  and timely dataflow.
-
-## Next Phone (from Aug 2018)
-
-Older [source](https://github.com/piotr-yuxuan/choose-a-new-phone) and [website](https://piotr-yuxuan.github.io/choose-a-new-phone) hosted on GitHub, more recent [source](https://gitlab.com/next-phone/next-phone.gitlab.io) and [website](https://next-ph.one) hosted on GitLab.
-
-- Strong accent on UX: explain interface behaviour in full, simple language so user can't be lost and understand as much as possible what he's doing.
-- For the Greater Cause ;-) try to be useful for LineageOS, a floss Android
-- Host, deploy from GitLab with GitLab CI
-- Clojure, core.async, dataflow programming (something akin timely-dataflow in Rust), lein figwheel then shadow-cljs, React 16.1, Material UI
-- Configure DNS, domain, deployment pipeline, and everything all from the ground up.
-
-## Environment configuration (from Mar 2018)
-
-https://github.com/piotr-yuxuan/public-environment-configuration
-
-![Last commit](https://img.shields.io/github/last-commit/piotr-yuxuan/public-environment-configuration)
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/public-environment-configuration/Walter%20CD)](https://github.com/piotr-yuxuan/public-environment-configuration/actions/workflows/walter-cd.yml)
-[![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/public-environment-configuration.svg)](https://clojars.org/com.github.piotr-yuxuan/public-environment-configuration)
-[![Clojars downloads](https://img.shields.io/clojars/dt/piotr-yuxuan/public-environment-configuration)](https://clojars.org/com.github.piotr-yuxuan/public-environment-configuration)
-[![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/public-environment-configuration)](https://cljdoc.org/d/com.github.piotr-yuxuan/public-environment-configuration/CURRENT)
-[![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/public-environment-configuration)](https://github.com/piotr-yuxuan/public-environment-configuration/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/public-environment-configuration)](https://github.com/piotr-yuxuan/public-environment-configuration/issues)
-
-Get a reproductible and declarative configuration of the programs I use for my daily life and document their use.
-
-It's quite clear that any sharing of personal dot files contains a risk of leaking secrets or confidential data. To mitigate this risk I've copied a private repo, deleted its history, then committed a carefully current state. Obviouly it's pretty outdated now and I don't plan to update the public version any soon.
-
-Hint: this repository makes heavy use of Emacs litterate programming capabilities (with org-mode and babel). Hence, please forgive broken links in the README. They would perfectly work when read in Emacs, but GitHub org-mode parser can't handle them properly.
-
-## PE2C, young three-person company website (from Mar 2018)
-
-https://github.com/pe2c/pe2c.github.io
-
-Corporate showcase website for a young, local three-person company.
-
-I tried my best to stick to the precise ideas the stakeholders had about design ^^ I'm here to serve them, not to change their minds, so I complied to their wishes. However, as for classified matter, I do endorse neither reject any material about this site.
-
-## Le mille pattes faisait un mille pièces (Oct 2017)
-
-https://piotr-yuxuan.github.io/1111101000-pieces/index.html
-
-(The centipede was making a hundred-piece puzzle)
-
-Let's be honnest and acknowledge it's not an very interesting project from a technical viewpoint. I worked with a friend of mine with is an artist. He was interested in studying the relation of human vision to disorder.
-
-## Illegal activity (from Aug 2017)
-
-https://github.com/piotr-yuxuan/illegal-activity
-
-Are you using the same laptop at home and at work? if you're company policies forbid usage of torrent software (even for legit, sharing reasons), how do you make sure you'll never be caught /by design/? At least you can prove you tried something to be compliant.
-
-In this project I got a bit more acquainted to macOS architecture. Here I use a =plist= file to detect and react to some events.
-
-## Polygam: choose as many spouses as you want (from Sep 2016)
-
-https://github.com/piotr-yuxuan/polygam
-
-Learning of logic programming with Clojure library core.logic. Given a tree of ancestors / descendants with some elicited vertices, what are all vertices that are elicited or descend from an elicited one?
-
-## Open street map cartography (from March 2016)
-
-Creation and integration of a hiking map layers and tracks for a 1500-km trail throughout France and Spain.
-
-## Analysis of chess games (from Feb 2016)
-
-https://github.com/piotr-yuxuan/PoC
-
-Learning of logic programming with Clojure library core.logic, deepening my understanding of this language. PGF notation file parsing and discovery available legal moves. However, nothing to be compared to Alpha Zero ;-) Here I do nothing against combinatorial explosion so you can't actually predict all possible three-move-far positions because it would boil the ocean.
-
-## Sinogram graph crawling (from Jul 2015)
-
-https://github.com/piotr-yuxuan/chinese-huawen
-
-- Functional programming with Clojure (JVM-based language)
-- Formal grammars with instaparse.
-
-This project is aimed at analysis of the sinogram set with graph and set theories. What’s the best way to learn and remember Chinese characters? Most of Chinese handbooks are built in a Western fashion: daily-life conversation samples bring new vocabulary and syntax examples. This fashion doesn’t take advantage of intrinsic Chinese language structure, which makes easier to discover 貴 when knowing yet中, 一 and 貝. 貴 stands for expensive or honourable while 貝 refers to shell or money. This semantic link lets it easy to remember both of them.
-
-The first character 華 of the project name means sinity; 文 stands for language. The whole phrase 華文 means Chinese language and is readㄏㄨㄚˊ ㄨㄣˊ or huáwén.
-
-This site has been in some extent redacted in French because part of this project is being developped whithin the frame of a school project.
+# What it offers
+
+This library provides out-of-the-box command line interface. It
+exposes a function that takes the `args` vector of `-main` and returns
+a map representing the parsed, decoded arguments and environment
+variables you are interested in.
+
+The return map can be used as a config fragment, or overrides, that
+you can later merge with the config value provided by any other
+system. As such it intends to play nicely with configuration tools, so
+the actual configuration value of your program is a map that is a
+graceful merge of several overlapping config fragment:
+
+1. Default configuration value;
+2. Environment variables when the program starts up;
+3. Value from some configuration management system;
+4. Command line arguments.
+
+The expected shape of your configuration being described as a malli
+schema so you can parse and decode strings as well as validating any
+constraints. It's quite powerful.
+
+# Maturity and evolution
+
+Semantic versioning is used, so no breaking changes will be introduced
+without incrementing the major version. Some bug fixes may be
+introduced but I currently don't plan to add any new feature. As
+examplified belowe, `malli-cli` should cover most of your use cases
+with simplicity – or open an issue.
+
+# Naming
+
+``` txt
+utility_name [-a][-b][-c option_argument]
+             [-d|-e][-f[option_argument]][operand...]
+```
+
+The utility in the example is named `utility_name`. It is followed by
+options, option-arguments, and operands. The arguments that consist of
+`-` characters and single letters or digits, such as `a`, are known as
+"options" (or, historically, "flags"). Certain options are followed by
+an "option-argument", as shown with `[ -c option_argument ]`. The
+arguments following the last options and option-arguments are named
+"operands".
+
+# Simple example
+
+Let's consider this config schema:
+
+``` clojure
+(require '[piotr-yuxuan.malli-cli :as malli-cli])
+(require '[malli.core :as m])
+
+(def Config
+  (m/schema
+    [:map {:closed true, :decode/args-transformer malli-cli/args-transformer}
+     [:show-config? [boolean? {:description "Print actual configuration value and exit."
+                               :optional true
+                               :arg-number 0}]]
+     [:help [boolean? {:description "Display usage summary and exit."
+                       :short-option "-h"
+                       :optional true
+                       :arg-number 0}]]
+     [:upload-api [string? {:description "Address of target upload-api instance. If not set from the command line, lookup env var $CORP_UPLOAD_API."
+                            :short-option "-a"
+                            ;; Cli option will be looked up, then env var, then default.
+                            :env-var "CORP_UPLOAD_API"
+                            :default "http://localhost:8080"}]]
+     [:log-level [:enum {:description "Non-idempotent -v increases log level, --log-level sets it."
+                         ;; Express how to decode a string into an enum value.
+                         :decode/string keyword
+                         :short-option "-v"
+                         :short-option/arg-number 0
+                         :short-option/update-fn malli-cli/non-idempotent-option
+                         :default :error
+                         ;; Used in summary to pretty-print the default value to a string.
+                         :default->str name}
+                  :off :fatal :error :warn :info :debug :trace :all]]
+     [:proxy [:map
+              [:host string?]
+              ;; malli will parse and return an integer.
+              [:port pos-int?]]]]))
+```
+
+Here is the command summary produced by `(malli-cli/summary Config)`
+for this config:
+
+``` txt
+  Short  Long option    Default                  Description
+         --show-config                           Print actual configuration value and exit.
+  -h     --help                                  Display usage summary and exit.
+  -a     --upload-api   "http://localhost:8080"  Address of target upload-api instance. If not set from the command line, lookup env var $CORP_UPLOAD_API.
+  -v     --log-level    error                    Non-idempotent -v increases log level, --log-level sets it.
+         --proxy-host
+         --proxy-port
+```
+
+Let's try to call this program (code details below). You may invoke
+your Clojure main function with:
+
+``` zsh
+lein run \
+  --help -vvv \
+  -a "https://localhost:4000"
+```
+
+Let's suppose your configuration system provides this value:
+
+``` clojure
+{:proxy {:host "https://proxy.example.com"
+         :port 3128}}
+```
+
+and the shell environment variable `CORP_UPLOAD_API` is set to
+`https://localhost:7000`. Then the resulting configuration passed to
+your app will be:
+
+``` clojure
+{:help true
+ :upload-api "https://localhost:4000"
+ :log-level :debug
+ :proxy {;; Nested config maps are supported
+         :host "http://proxy.example.com"
+         ;; malli transform strings into appropriate types
+         :port 3128}
+```
+
+Let's try another time with this command with same provided config and
+env vars:
+
+``` zsh
+lein run \
+  --log-level=off
+  --show-config
+```
+
+The program will exit after printing:
+
+``` clojure
+{:log-level :off,
+ :show-config? true,
+ :upload-api "http://localhost:7000"}
+```
+
+---
+
+From a technical point of view, it leverages malli coercion and
+decoding capabilities so that you may define the shape of your
+configuration and default value in one place, then derive a
+command-line interface from it.
+
+``` clojure
+(require '[piotr-yuxuan.malli-cli :as malli-cli])
+(require '[malli.core :as m])
+(require '[clojure.pprint])
+(require '[piotr-yuxuan.malli-cli.utils :refer [deep-merge]])
+
+(defn load-config
+  [args]
+  (deep-merge
+    ;; Value retrieved from any configuration system you want
+    (:value (configure {:key service-name
+                        :env (env)
+                        :version (version)}))
+    ;; Command-line arguments, env-vars, and default values.
+    (m/decode Config args malli-cli/cli-transformer)))
+
+(defn -main
+  [& args]
+  (let [config (load-config args)]
+    (cond (not (m/validate Config config))
+          (do (log/error "Invalid configuration value"
+                         (m/explain Config config))
+              (Thread/sleep 60000) ; Leave some time to retrieve the logs.
+              (System/exit 1))
+
+          (:show-config? config)
+          (do (clojure.pprint/pprint config)
+              (System/exit 0))
+
+          (:help config)
+          (do (println (simple-summary Config))
+              (System/exit 0))
+
+          :else
+          (app/start config))))
+```
+
+# Capabilities
+
+See tests for minimal working code for each of these examples.
+
+- Long option flag and value `--long-option VALUE` may give
+
+``` clj
+{:long-option "VALUE"}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+  [:long-option string?]]
+```
+
+- Grouped flag and value with `--long-option=VALUE` may give
+
+``` clj
+{:long-option "VALUE"}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+  [:long-option string?]]
+```
+
+- Short option names with `-s VALUE` may give
+
+``` clj
+{:some-option "VALUE"}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:some-option [string? {:short-option "-s"}]]]
+```
+
+- Options that accept a variable number of arguments: `-a -b val0 --c
+  val1 val2`
+
+``` clj
+{:a true
+ :b "val0"
+ :c ["val1" "val2"]}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:a [boolean? {:arg-number 0}]]
+ [:b string?]
+ [:c [string? {:arg-number 2}]]]
+```
+
+- Non-option arguments are supported directly amongst options, or
+  after a double-dash so `-a 1 ARG0 -b 2 -- ARG1 ARG2` may be
+  equivalent to:
+
+``` clj
+{:a 1
+ :b 2
+ :piotr-yuxuan.malli-cli/arguments ["ARG0" "ARG1" "ARG2"]}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:a [boolean? {:arg-number 0}]]
+ [:b string?]]
+```
+
+- Grouped short flags like `-hal` are expanded like, for example:
+
+``` clj
+{:help true
+ :all true
+ :list true}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:help [boolean? {:short-option "-h" :arg-number 0}]]
+ [:all [boolean? {:short-option "-a" :arg-number 0}]]
+ [:list [boolean? {:short-option "-l" :arg-number 0}]]]
+```
+
+- Non-idempotent options like `-vvv` are supported and may be rendered as:
+
+``` clj
+{:verbosity 3}
+;; or, depending on what you want:
+{:log-level :debug}
+
+;; Example schemas:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:log-level [:and
+              keyword?
+              [:enum {:short-option "-v"
+                      :short-option/arg-number 0
+                      :short-option/update-fn malli-cli/non-idempotent-option
+                      :default :error}
+               :off :fatal :error :warn :info :debug :trace :all]]]]
+
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:verbosity [int? {:short-option "-v"
+                    :short-option/arg-number 0
+                    :short-option/update-fn (fn [options {:keys [in]} _cli-args]
+                                              (update-in options in (fnil inc 0)))
+                    :default 0}]]]
+```
+
+- You may use nested maps in your config schema so that `--proxy-host
+  https://example.org/upload --proxy-port 3447` is expanded as:
+
+``` clj
+{:proxy {:host "https://example.org/upload"
+         :port 3447}}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:proxy [:map
+          [:host string?]
+          [:port pos-int?]]]]
+```
+
+- Namespaced keyword are allowed, albeit the command-line option name
+  stays simple `--upload-parallelism 32` may give:
+
+```clj
+{:upload/parallelism 32}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:upload/parallelism pos-int?]]
+```
+
+- You can provide your own code to update the result map with some
+  complex behaviour, like for example `--name Piotr`:
+
+``` clj
+{:vanity-name ">> Piotr <<"
+ :original-name "Piotr"
+ :first-letter \P}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:vanity-name [string? {:long-option "--name"
+                         :update-fn (fn [options {:keys [in]} [username]]
+                                      (-> options
+                                          (assoc :vanity-name (format ">> %s <<" username))
+                                          (assoc :original-name username)
+                                          (assoc :first-letter (first username))))}]]
+ [:original-name string?]
+ [:first-letter char?]]
+```
+
+- Build a simple summary string (see schema Config above):
+
+``` txt
+  -h  --help        nil
+  -a  --upload-api  "http://localhost:8080"  Address of target upload-api instance.
+  -v  --log-level   :error
+      --proxy-host  nil
+      --proxy-port  nil
+```
+
+- Error handling with unknown options:
+
+``` clojure
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:my-option string?]]
+
+;; Example input:
+["--unknown-long-option" "--other-option" "VALUE" "-s"}
+
+;; Exemple output:
+#:piotr-yuxuan.malli-cli{:unknown-option-errors ({:arg "-s"} {:arg "--other-option"} {:arg "--unknown-long-option"}),
+                         :known-options ("--my-option"),
+                         :arguments ["VALUE"],
+                         :cli-args ["--unknown-long-option" "--other-option" "VALUE" "-s"]}
+```
+
+- Environment variable `USER` set to `piotr-yuxuan` may give:
+
+``` clojure
+{:user "piotr-yuxuan"}
+
+;; Example schema:
+[:map {:decode/args-transformer malli-cli/args-transformer}
+ [:user [string? {:env-var "USER"}]]]
+```
+
+Note that environment variables behave like default values with lower
+priority than command-line arguments. Env vars are resolved at decode
+time, not at schema compile time. This lack of purity is balanced by
+the environment being constant and set by the JVM at start-up time.
+
+# References
+
+- [GNU Program Argument Syntax Conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html)
+- [POSIX.1-2017 Utility argument syntax](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html)
+- https://github.com/l3nz/cli-matic is a similar, more established project.
