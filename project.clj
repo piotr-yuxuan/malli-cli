@@ -11,7 +11,8 @@
                               [:url "https://github.com/piotr-yuxuan"]]]
   :dependencies []
   :profiles {:github {:github/topics ["cli" "clojure" "command-line" "cli-app"
-                                      "command-line-tool" "args-parser" "malli"]}
+                                      "command-line-tool" "args-parser" "malli"]
+                      :github/private? false}
              :provided {:dependencies [[org.clojure/clojure "1.11.0"]
                                        [metosin/malli "0.8.4"]]}
              :dev {:global-vars {*warn-on-reflection* true}
