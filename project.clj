@@ -19,7 +19,7 @@
                    :dependencies [[camel-snake-kebab "0.4.2"]]}
              :jar {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=false"
                               "-Dclojure.compiler.direct-linking=true"]}
-             :kaocha [:test {:dependencies [[lambdaisland/kaocha "1.65.1029"]]}]}
+             :kaocha [:test {:dependencies [[lambdaisland/kaocha "1.66.1034"]]}]}
   :deploy-repositories [["clojars" {:sign-releases false
                                     :url "https://clojars.org/repo"
                                     :username :env/WALTER_CLOJARS_USERNAME
