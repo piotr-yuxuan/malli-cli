@@ -14,7 +14,7 @@
                                       "command-line-tool" "args-parser" "malli"]
                       :github/private? false}
              :provided {:dependencies [[org.clojure/clojure "1.11.1"]
-                                       [metosin/malli "0.8.4"]]}
+                                       [metosin/malli "0.8.8"]]}
              :dev {:global-vars {*warn-on-reflection* true}
                    :dependencies [[camel-snake-kebab "0.4.3"]]}
              :jar {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=false"
