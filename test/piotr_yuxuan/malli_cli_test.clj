@@ -1,10 +1,10 @@
 (ns piotr-yuxuan.malli-cli-test
-  (:require [clojure.test :refer [deftest testing is]]
-            [piotr-yuxuan.malli-cli :as malli-cli]
+  (:require [piotr-yuxuan.malli-cli :as malli-cli]
+            [piotr-yuxuan.malli-cli.malli :as m']
+            [clojure.test :refer [deftest testing is]]
             [malli.core :as m]
             [malli.transform :as mt]
-            [malli.util :as mu]
-            [piotr-yuxuan.malli-cli.malli :as m']))
+            [malli.util :as mu]))
 
 (deftest children-successor-test
   (is (= (malli-cli/children-successor [:enum :a :b :c :d])
