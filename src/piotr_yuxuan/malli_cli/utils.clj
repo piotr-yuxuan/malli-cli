@@ -2,9 +2,16 @@
   "General functions and utilities that could be part of clojure standard library, but aren't."
   (:require [clojure.string :as str]))
 
-(def ^{:arglists '([f m])}
-  remove-key
-  #(#'clojure.core/filter-key first (complement %1) %2))
+(defn filter-key [keyfn pred amap]
+  (loop [ret {} es (seq amap)]
+    (if es
+      (if (pred (keyfn (first es)))
+        (recur (assoc ret (key (first es)) (val (first es))) (next es))
+        (recur ret (next es)))
+      ret)))
+
+(def ^{:arglists '([f m])} remove-key
+  #(filter-key first (complement %1) %2))
 
 (defn -make-format
   ;; From clojure/tools.cli
