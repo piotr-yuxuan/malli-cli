@@ -13,7 +13,7 @@
   :profiles {:github {:github/topics ["cli" "clojure" "command-line" "cli-app"
                                       "command-line-tool" "args-parser" "malli"]
                       :github/private? false}
-             :provided {:dependencies [[org.clojure/clojure "1.12.0-alpha1"]
+             :provided {:dependencies [[org.clojure/clojure "1.12.0-alpha2"]
                                        [metosin/malli "0.11.0"]]}
              :dev {:global-vars {*warn-on-reflection* true}
                    :dependencies [[camel-snake-kebab "0.4.3"]]}
