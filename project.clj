@@ -14,7 +14,8 @@
                                       "command-line-tool" "args-parser" "malli"
                                       "configuration" "configuration-management"
                                       "env-var" "environment-variable" "secret"
-                                      "secret-management" "sourcing"]
+                                      "secret-management" "sourcing" "babashka"
+                                      "bb" "graalvm" "command-line-parser"]
                       :github/private? false}
              :provided {:dependencies [[org.clojure/clojure "1.12.0-alpha3"]
                                        [metosin/malli "0.11.0"]]}
