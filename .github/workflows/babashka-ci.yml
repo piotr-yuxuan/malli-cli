@@ -1,0 +1,15 @@
+name: Babashka CI
+
+on: [push, pull_request]
+
+jobs:
+  babashka-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup Babashka
+        uses: turtlequeue/setup-babashka@1e886ef84f68692d42c5128245ac83e7dd38ce70
+        with:
+          babashka-version: 1.3.180
+      - name: Babashka tests
+        run: bb test

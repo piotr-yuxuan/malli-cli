@@ -1,0 +1,9 @@
+{:paths ["src" "test"]
+ :deps {metosin/malli {:mvn/version "0.11.0"}
+        project/deps {:local/root "."}}
+ :tasks {test {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "b3fd0d2"}}
+               :requires ([cognitect.test-runner :as tr])
+               :task (apply tr/-main
+                       "-d" "test"
+                       "-e" "skip-bb"
+                       *command-line-args*)}}}

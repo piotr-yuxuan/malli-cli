@@ -4,12 +4,14 @@
 
 Configuration powertool with `metosin/malli`.
 
-[![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/malli-cli/Walter%20CD)](https://github.com/piotr-yuxuan/malli-cli/actions/workflows/walter-cd.yml)
+
+[![Build Status](https://github.com/piotr-yuxuan/malli-cli/actions/workflows/walter-cd.yml/badge.svg)](https://github.com/piotr-yuxuan/malli-cli/actions/workflows/walter-cd.yml)
 [![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/malli-cli.svg)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
 [![Clojars downloads](https://img.shields.io/clojars/dt/com.github.piotr-yuxuan/malli-cli)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
 [![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/malli-cli)](https://cljdoc.org/d/com.github.piotr-yuxuan/malli-cli/CURRENT)
 [![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
+<a href="https://babashka.org" rel="nofollow"><img src="https://github.com/babashka/babashka/raw/master/logo/badge.svg" alt="bb compatible" style="max-width: 100%;"></a>
 
 # What it offers
 
