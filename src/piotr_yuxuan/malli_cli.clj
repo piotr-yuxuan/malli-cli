@@ -230,17 +230,13 @@
                         (get *system-get-env*)))}))
 
 (def cli-transformer
-  "Use it for dumb, do-what-I-mean cli args parsing. Simple transformer
-  for the most common use cases when you only want to get a (nested)
-  map of options out of command-line arguments:
+  "Use it for straightforward, do-what-I-mean cli args parsing. Simple
+  transformer for the most common use cases when you only want to get
+  a (nested) map of options out of command-line arguments:
 
-  - `mt/strip-extra-keys-transformer` will remove any extraneous keys;
-
-  - `m'/default-value-transformer` with `:env-var` injects environment
-    variables (read at decode time);
-
-  - `(m'/default-value-transformer {:key :default})` fills the blank
-    with default values when applicable."
+  - Remove extraneous keys;
+  - Inject values from environment variables;
+  - Fills the blank with default values when applicable."
   (mt/transformer
     args-transformer
     mt/strip-extra-keys-transformer ; Remove it for debug, or more advanced usage.

@@ -65,13 +65,13 @@ Let's consider this config schema:
 (def Config
   (m/schema
     [:map {:closed true, :decode/args-transformer malli-cli/args-transformer}
-     [:show-config? [boolean? {:description "Print actual configuration value and exit."
-                               :optional true
-                               :arg-number 0}]]
-     [:help [boolean? {:description "Display usage summary and exit."
-                       :short-option "-h"
-                       :optional true
-                       :arg-number 0}]]
+     [:show-config? {:optional true}
+      [boolean? {:description "Print actual configuration value and exit."
+                 :arg-number 0}]]
+     [:help {:optional true}
+      [boolean? {:description "Display usage summary and exit."
+                 :short-option "-h"
+                 :arg-number 0}]]
      [:upload-api [string? {:description "Address of target upload-api instance. If not set from the command line, lookup env var $CORP_UPLOAD_API."
                             :short-option "-a"
                             ;; Cli option will be looked up, then env var, then default.
