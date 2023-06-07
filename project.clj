@@ -16,9 +16,9 @@
              :provided {:dependencies [[org.clojure/clojure "1.12.0-alpha3"]
                                        [metosin/malli "0.11.0"]]}
              :dev {:global-vars {*warn-on-reflection* true}
-                   :dependencies [[camel-snake-kebab "0.4.3"]]}
-             :jar {:jvm-opts ["-Dclojure.compiler.disable-locals-clearing=false"
-                              "-Dclojure.compiler.direct-linking=true"]}
+                   :dependencies [[camel-snake-kebab "0.4.3"]]
+                   :jvm-opts ["-Dclojure.compiler.direct-linking=false"]}
+             :jar {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
              :kaocha [:test {:dependencies [[lambdaisland/kaocha "1.84.1335"]]}]}
   :deploy-repositories [["clojars" {:sign-releases false
                                     :url "https://clojars.org/repo"
