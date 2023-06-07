@@ -13,33 +13,31 @@ Command-line interface with malli.
 
 # What it offers
 
-This library provides out-of-the-box command line interface. It
-exposes a function that takes the `args` vector of `-main` and returns
-a map representing the parsed, decoded arguments and environment
-variables you are interested in.
+This library provides out-of-the-box command line interface. It exposes a
+function that takes the `args` vector of `-main` and returns a map representing
+the parsed, decoded arguments and environment variables you are interested in.
 
-The return map can be used as a config fragment, or overrides, that
-you can later merge with the config value provided by any other
-system. As such it intends to play nicely with configuration tools, so
-the actual configuration value of your program is a map that is a
-graceful merge of several overlapping config fragment:
+The return map can be used as a config fragment, or overrides, that you can
+later merge with the config value provided by any other system. As such it
+intends to play nicely with configuration tools, so the actual configuration
+value of your program is a map that is a graceful merge of several overlapping
+config fragment:
 
 1. Default configuration value;
 2. Environment variables when the program starts up;
 3. Value from some configuration management system;
 4. Command line arguments.
 
-The expected shape of your configuration being described as a malli
-schema so you can parse and decode strings as well as validating any
-constraints. It's quite powerful.
+The expected shape of your configuration being described as a malli schema so
+you can parse and decode strings as well as validating any constraints. It's
+quite powerful.
 
 # Maturity and evolution
 
-Semantic versioning is used, so no breaking changes will be introduced
-without incrementing the major version. Some bug fixes may be
-introduced but I currently don't plan to add any new feature. As
-examplified belowe, `malli-cli` should cover most of your use cases
-with simplicity – or open an issue.
+Semantic versioning is used, so no breaking changes will be introduced without
+incrementing the major version. Some bug fixes may be introduced but I currently
+don't plan to add any new feature. As examplified belowe, `malli-cli` should
+cover most of your use cases with simplicity – or open an issue.
 
 # Naming
 
@@ -48,12 +46,12 @@ utility_name [-a][-b][-c option_argument]
              [-d|-e][-f[option_argument]][operand...]
 ```
 
-The utility in the example is named `utility_name`. It is followed by
-options, option-arguments, and operands. The arguments that consist of
+The utility in the example is named `utility_name`. It is followed by options,
+option-arguments, and operands. The arguments that consist of
 `-` characters and single letters or digits, such as `a`, are known as
-"options" (or, historically, "flags"). Certain options are followed by
-an "option-argument", as shown with `[ -c option_argument ]`. The
-arguments following the last options and option-arguments are named
+"options" (or, historically, "flags"). Certain options are followed by an "
+option-argument", as shown with `[ -c option_argument ]`. The arguments
+following the last options and option-arguments are named
 "operands".
 
 # Simple example
@@ -108,8 +106,8 @@ for this config:
          --proxy-port
 ```
 
-Let's try to call this program (code details below). You may invoke
-your Clojure main function with:
+Let's try to call this program (code details below). You may invoke your Clojure
+main function with:
 
 ``` zsh
 lein run \
@@ -125,8 +123,8 @@ Let's suppose your configuration system provides this value:
 ```
 
 and the shell environment variable `CORP_UPLOAD_API` is set to
-`https://localhost:7000`. Then the resulting configuration passed to
-your app will be:
+`https://localhost:7000`. Then the resulting configuration passed to your app
+will be:
 
 ``` clojure
 {:help true
@@ -138,8 +136,7 @@ your app will be:
          :port 3128}
 ```
 
-Let's try another time with this command with same provided config and
-env vars:
+Let's try another time with this command with same provided config and env vars:
 
 ``` zsh
 lein run \
@@ -157,10 +154,9 @@ The program will exit after printing:
 
 ---
 
-From a technical point of view, it leverages malli coercion and
-decoding capabilities so that you may define the shape of your
-configuration and default value in one place, then derive a
-command-line interface from it.
+From a technical point of view, it leverages malli coercion and decoding
+capabilities so that you may define the shape of your configuration and default
+value in one place, then derive a command-line interface from it.
 
 ``` clojure
 (require '[piotr-yuxuan.malli-cli :as malli-cli])
@@ -233,8 +229,7 @@ See tests for minimal working code for each of these examples.
  [:some-option [string? {:short-option "-s"}]]]
 ```
 
-- Options that accept a variable number of arguments: `-a -b val0 --c
-  val1 val2`
+- Options that accept a variable number of arguments: `-a -b val0 --c val1 val2`
 
 ``` clj
 {:a true
@@ -248,9 +243,8 @@ See tests for minimal working code for each of these examples.
  [:c [string? {:arg-number 2}]]]
 ```
 
-- Non-option arguments are supported directly amongst options, or
-  after a double-dash so `-a 1 ARG0 -b 2 -- ARG1 ARG2` may be
-  equivalent to:
+- Non-option arguments are supported directly amongst options, or after a
+  double-dash so `-a 1 ARG0 -b 2 -- ARG1 ARG2` may be equivalent to:
 
 ``` clj
 {:a 1
@@ -316,8 +310,8 @@ See tests for minimal working code for each of these examples.
           [:port pos-int?]]]]
 ```
 
-- Namespaced keyword are allowed, albeit the command-line option name
-  stays simple `--upload-parallelism 32` may give:
+- Namespaced keyword are allowed, albeit the command-line option name stays
+  simple `--upload-parallelism 32` may give:
 
 ```clj
 {:upload/parallelism 32}
@@ -327,8 +321,8 @@ See tests for minimal working code for each of these examples.
  [:upload/parallelism pos-int?]]
 ```
 
-- You can provide your own code to update the result map with some
-  complex behaviour, like for example `--name Piotr`:
+- You can provide your own code to update the result map with some complex
+  behaviour, like for example `--name Piotr`:
 
 ``` clj
 {:vanity-name ">> Piotr <<"
@@ -384,10 +378,6 @@ See tests for minimal working code for each of these examples.
  [:user [string? {:env-var "USER"}]]]
 ```
 
-Note that environment variables behave like default values with lower
-priority than command-line arguments. Env vars are resolved at decode
-time, not at schema compile time. This lack of purity is balanced by
-the environment being constant and set by the JVM at start-up time.
 - Protect secret values and keep them out of logs when configuration is printed.
   Secrets are turned into strings by default, but you may provide
   custom `secret-fn` and `plaintext-fn`.
@@ -408,6 +398,10 @@ the environment being constant and set by the JVM at start-up time.
     :database/password "***"}
 ```
 
+Note that environment variables behave like default values with lower priority
+than command-line arguments. Env vars are resolved at decode time, not at schema
+compile time. This lack of purity is balanced by the environment being constant
+and set by the JVM at start-up time.
 
 # References
 
