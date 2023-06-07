@@ -2,7 +2,7 @@
 
 ![](./doc/controller.jpg)
 
-Command-line interface with malli.
+Configuration powertool with `metosin/malli`.
 
 [![Build status](https://img.shields.io/github/workflow/status/piotr-yuxuan/malli-cli/Walter%20CD)](https://github.com/piotr-yuxuan/malli-cli/actions/workflows/walter-cd.yml)
 [![Clojars badge](https://img.shields.io/clojars/v/com.github.piotr-yuxuan/malli-cli.svg)](https://clojars.org/com.github.piotr-yuxuan/malli-cli)
@@ -13,15 +13,22 @@ Command-line interface with malli.
 
 # What it offers
 
-This library provides out-of-the-box command line interface. It exposes a
-function that takes the `args` vector of `-main` and returns a map representing
-the parsed, decoded arguments and environment variables you are interested in.
+This library provides out-of-the-box:
 
-The return map can be used as a config fragment, or overrides, that you can
-later merge with the config value provided by any other system. As such it
-intends to play nicely with configuration tools, so the actual configuration
-value of your program is a map that is a graceful merge of several overlapping
-config fragment:
+- Configuration sourcing from command line arguments, environment variables, or
+  any other configuration management tool you want to integrate with;
+- Very expressive means to describe the configuration you expect;
+- An agnostic way to protect secrets in your config that turn them into opaque,
+  non-printable values, while still being able to decode them and access the
+  original value when need be;
+- Seamless and powerful CLI generation based on your config schema, returns a
+  map representing the parsed, decoded arguments and environment variables you
+  are interested in.
+
+The returned map can be used as a config fragment, that you can later merge with
+the config value provided by any other system. As such it intends to play nicely
+with configuration tools, so the actual configuration value of your program is a
+map that is a graceful merge of several overlapping config fragment:
 
 1. Default configuration value;
 2. Environment variables when the program starts up;
@@ -34,10 +41,10 @@ quite powerful.
 
 # Maturity and evolution
 
-Semantic versioning is used, so no breaking changes will be introduced without
-incrementing the major version. Some bug fixes may be introduced but I currently
-don't plan to add any new feature. As examplified belowe, `malli-cli` should
-cover most of your use cases with simplicity – or open an issue.
+Break versioning is used, so no breaking changes will be introduced without
+incrementing the major version. Some bug fixes may be introduced and I will keep
+adding new features as I encounter new needs. As illustrated below, `malli-cli`
+should already cover most of your use cases with simplicity – or open an issue.
 
 # Naming
 

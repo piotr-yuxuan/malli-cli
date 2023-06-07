@@ -1,5 +1,5 @@
 (defproject com.github.piotr-yuxuan/malli-cli (-> "./resources/malli-cli.version" slurp .trim)
-  :description "Command-line interface from the comfort of a metosin/malli schema"
+  :description "Configuration powertool with `metosin/malli`"
   :url "https://github.com/piotr-yuxuan/malli-cli"
   :license {:name "European Union Public License 1.2 or later"
             :url "https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12"
@@ -11,7 +11,10 @@
                               [:url "https://github.com/piotr-yuxuan"]]]
   :dependencies []
   :profiles {:github {:github/topics ["cli" "clojure" "command-line" "cli-app"
-                                      "command-line-tool" "args-parser" "malli"]
+                                      "command-line-tool" "args-parser" "malli"
+                                      "configuration" "configuration-management"
+                                      "env-var" "environment-variable" "secret"
+                                      "secret-management" "sourcing"]
                       :github/private? false}
              :provided {:dependencies [[org.clojure/clojure "1.12.0-alpha3"]
                                        [metosin/malli "0.11.0"]]}
