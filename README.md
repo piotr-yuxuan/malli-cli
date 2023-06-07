@@ -388,6 +388,26 @@ Note that environment variables behave like default values with lower
 priority than command-line arguments. Env vars are resolved at decode
 time, not at schema compile time. This lack of purity is balanced by
 the environment being constant and set by the JVM at start-up time.
+- Protect secret values and keep them out of logs when configuration is printed.
+  Secrets are turned into strings by default, but you may provide
+  custom `secret-fn` and `plaintext-fn`.
+
+``` clojure
+(m/encode
+  [:map
+   [:ui/service-name string?]
+   [:database/username {:secret true} string?]
+   [:database/password {:secret true} string?]]
+  {:ui/service-name "Hello, world!"
+   :database/username "Username must stay out of logs."
+   :database/password "Password must stay out of logs."}
+  malli-cli/secret-transformer)
+
+=> {:ui/service-name "Hello, world!",
+    :database/username "***",
+    :database/password "***"}
+```
+
 
 # References
 

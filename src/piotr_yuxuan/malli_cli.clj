@@ -5,7 +5,8 @@
             [piotr-yuxuan.malli-cli.utils :refer [remove-key -make-format]]
             [clojure.string :as str]
             [malli.core :as m]
-            [malli.transform :as mt])
+            [malli.transform :as mt]
+            [malli.util :as mu])
   (:import (clojure.lang MapEntry)))
 
 (defn children-successor
@@ -200,6 +201,23 @@
                 (fn [args]
                   (parse-args label+value-schemas
                               args))))})
+
+(defn secret-transformer
+  "A malli transformer that you can use to encode secret values into
+  redacted strings or any other opaque type that can't be displayed in
+  logs."
+  ([] (secret-transformer {}))
+  ([{:keys [secret-fn plaintext-fn]
+     :or {secret-fn (constantly "***")
+          plaintext-fn nil}}]
+   (mt/transformer
+     {:name :args-transformer
+      :default-encoder {:compile (fn [schema _]
+                                   (when (:secret (m/properties schema))
+                                     secret-fn))}
+      :default-decoder {:compile (fn [schema _]
+                                   (when (:secret (m/properties schema))
+                                     plaintext-fn))}})))
 
 (defn ^:dynamic *system-get-env*
   []

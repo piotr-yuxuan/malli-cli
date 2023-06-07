@@ -4,7 +4,9 @@
             [clojure.test :refer [deftest testing is]]
             [malli.core :as m]
             [malli.transform :as mt]
-            [malli.util :as mu]))
+            [malli.util :as mu]
+            [malli.generator :as mg])
+  (:import (java.io Writer)))
 
 (deftest children-successor-test
   (is (= (malli-cli/children-successor [:enum :a :b :c :d])
@@ -427,3 +429,61 @@
          --proxy-port
          --async-parallelism      64                       Parallelism factor for `core.async`.
          --create-market-dataset  false                    Create the dataset.")))
+
+(def Redacted
+  [:map
+   [:a keyword?]
+   [:b {:secret false} int?]
+   [:c {:secret true} int?]
+   [:d {:default 1 :secret false} int?]
+   [:e {:default 1 :secret true} int?]
+   [:f {:optional true :secret false} int?]
+   [:g {:optional true :secret true} int?]
+   [:h {:optional true :default 1 :secret false} int?]
+   [:i {:optional true :default 1 :secret true} int?]
+
+   [:j [int? {:secret false}]]
+   [:k [int? {:secret true}]]
+   [:l [int? {:default 1 :secret false}]]
+   [:m [int? {:default 1 :secret true}]]
+   [:n {:optional true} [int? {:secret false}]]
+   [:o {:optional true} [int? {:secret true}]]
+   [:p {:optional true} [int? {:default 1 :secret false}]]
+   [:q {:optional true} [int? {:default 1 :secret true}]]])
+
+;; Here `^:dynamic` is just to avoid a warning. It doesn't matter otherwise.
+(def ^String ^:dynamic *** "***")
+(defrecord VerySecret [x] Object (toString [_] ***))
+(defmethod print-method VerySecret [_ ^Writer w] (.write w ***))
+
+(deftest secret-transformer-test
+  (let [filled-value {:a :hello/👋 :b 1 :c 1 :d 1 :e 1 :f 1 :g 1 :h 1 :i 1 :j 1 :k 1 :l 1 :m 1 :n 1 :o 1 :p 1 :q 1}]
+    (testing "default obfuscated string"
+      (is (= {:a :hello/👋 :b 1 :c *** :d 1 :e *** :f 1 :g *** :h 1 :i *** :j 1 :k *** :l 1 :m *** :n 1 :o *** :p 1 :q ***}
+             (m/encode (m/schema Redacted) filled-value (mt/transformer malli-cli/secret-transformer))))
+      (is (= {} (m/encode (m/schema Redacted) {} (mt/transformer malli-cli/secret-transformer))))
+      (is (= {:d 1, :e ***, :l 1, :m ***}
+             (m/encode (m/schema Redacted) {} (mt/transformer mt/default-value-transformer malli-cli/secret-transformer))
+             (m/encode (m/schema Redacted) {} (mt/transformer malli-cli/secret-transformer mt/default-value-transformer)))))
+    (testing "custom printable obfuscated string"
+      (let [redacted-string (mg/generate string?)
+            secret-fn (constantly redacted-string)]
+        (is (= {:a :hello/👋 :b 1 :c redacted-string :d 1 :e redacted-string :f 1 :g redacted-string :h 1 :i redacted-string :j 1 :k redacted-string :l 1 :m redacted-string :n 1 :o redacted-string :p 1 :q redacted-string}
+               (m/encode (m/schema Redacted) filled-value (mt/transformer (malli-cli/secret-transformer {:secret-fn secret-fn})))))
+        (is (= {} (m/encode (m/schema Redacted) {} (mt/transformer (malli-cli/secret-transformer {:secret-fn secret-fn})))))
+        (is (= {:d 1, :e redacted-string, :l 1, :m redacted-string}
+               (m/encode (m/schema Redacted) {} (mt/transformer mt/default-value-transformer (malli-cli/secret-transformer {:secret-fn secret-fn})))
+               (m/encode (m/schema Redacted) {} (mt/transformer (malli-cli/secret-transformer {:secret-fn secret-fn}) mt/default-value-transformer))))))
+    (testing "obfuscated object"
+      (let [secret-fn ->VerySecret]
+        (is (->> (m/encode (m/schema Redacted) filled-value (mt/transformer (malli-cli/secret-transformer {:secret-fn secret-fn})))
+                 (filter (comp #(instance? VerySecret %) val))
+                 keys set (= #{:q :o :m :e :k :g :c :i})))))
+    (testing "decoding from secret container"
+      (let [secret-fn ->VerySecret
+            plaintext-fn #(.-x ^VerySecret %)
+            t (malli-cli/secret-transformer {:secret-fn secret-fn, :plaintext-fn plaintext-fn})
+            value {:a :hello/👋 :b 1 :c 2}]
+        (is (= value (as-> value $
+                           (m/encode (m/schema Redacted) $ t)
+                           (m/decode (m/schema Redacted) $ t))))))))
