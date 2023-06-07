@@ -5,8 +5,7 @@
             [piotr-yuxuan.malli-cli.utils :refer [remove-key -make-format]]
             [clojure.string :as str]
             [malli.core :as m]
-            [malli.transform :as mt]
-            [malli.util :as mu])
+            [malli.transform :as mt])
   (:import (clojure.lang MapEntry)))
 
 (defn children-successor
@@ -219,9 +218,16 @@
                                    (when (:secret (m/properties schema))
                                      plaintext-fn))}})))
 
-(defn ^:dynamic *system-get-env*
-  []
-  (System/getenv))
+(def ^:dynamic *system-get-env*
+  nil)
+
+(def env-var-transformer
+  (mt/default-value-transformer
+    {:key :env-var
+     :default-fn (fn [schema _]
+                   (->> (m/properties schema)
+                        :env-var
+                        (get *system-get-env*)))}))
 
 (def cli-transformer
   "Use it for dumb, do-what-I-mean cli args parsing. Simple transformer
@@ -239,8 +245,7 @@
     args-transformer
     mt/strip-extra-keys-transformer ; Remove it for debug, or more advanced usage.
     mt/string-transformer
-    (mt/default-value-transformer {:key :env-var
-                                   :default-fn #(get (*system-get-env*) %2)})
+    env-var-transformer
     (mt/default-value-transformer {:key :default})))
 
 (defn start-with?

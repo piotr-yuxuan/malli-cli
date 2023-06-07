@@ -250,7 +250,7 @@
   (testing "environment variables: cli options will be looked up, then env var, then default."
     (testing "value from cli options"
       (let [cli-args ["--upload-api" "http://test.mock"]]
-        (is (= (binding [malli-cli/*system-get-env* (constantly {"CORP_UPLOAD_API" "https://api.upload-big-corp.com/data"})]
+        (is (= (binding [malli-cli/*system-get-env* {"CORP_UPLOAD_API" "https://api.upload-big-corp.com/data"}]
                  (m/decode MyCliSchema cli-args (mt/transformer malli-cli/cli-transformer)))
                {:upload-api "http://test.mock",
                 :help false,
@@ -258,7 +258,7 @@
                 :async-parallelism 64,
                 :create-market-dataset false}))))
     (testing "value from env var"
-      (is (= (binding [malli-cli/*system-get-env* (constantly {"CORP_UPLOAD_API" "https://api.upload-big-corp.com/data"})]
+      (is (= (binding [malli-cli/*system-get-env* {"CORP_UPLOAD_API" "https://api.upload-big-corp.com/data"}]
                (m/decode MyCliSchema [] (mt/transformer malli-cli/cli-transformer)))
              {:upload-api "https://api.upload-big-corp.com/data",
               :help false,
@@ -266,7 +266,7 @@
               :async-parallelism 64,
               :create-market-dataset false})))
     (testing "value from defaults"
-      (is (= (binding [malli-cli/*system-get-env* (constantly {})]
+      (is (= (binding [malli-cli/*system-get-env* {}]
                (m/decode MyCliSchema [] (mt/transformer malli-cli/cli-transformer)))
              {:upload-api "http://localhost:8080",
               :help false,
@@ -410,12 +410,13 @@
           :original-name "Piotr"
           :first-letter \P}))
 
-  (is (= (m/decode
-           [:map {:decode/args-transformer malli-cli/args-transformer}
-            [:user [string? {:env-var "USER"}]]]
-           []
-           (mt/transformer malli-cli/cli-transformer))
-         {:user (System/getenv "USER")})))
+  (binding [malli-cli/*system-get-env* {"USER" (System/getenv "USER")}]
+    (is (= (m/decode
+             [:map {:decode/args-transformer malli-cli/args-transformer}
+              [:user [string? {:env-var "USER"}]]]
+             []
+             (mt/transformer malli-cli/cli-transformer))
+           {:user (System/getenv "USER")}))))
 
 (deftest simple-summary-test
   (is (= (malli-cli/summary MyCliSchema)
