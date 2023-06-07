@@ -3,9 +3,9 @@
             [piotr-yuxuan.malli-cli.malli :as m']
             [clojure.test :refer [deftest testing is]]
             [malli.core :as m]
+            [malli.generator :as mg]
             [malli.transform :as mt]
-            [malli.util :as mu]
-            [malli.generator :as mg])
+            [malli.util :as mu])
   (:import (java.io Writer)))
 
 (deftest children-successor-test
