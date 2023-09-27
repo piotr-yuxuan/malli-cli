@@ -23,7 +23,7 @@
                    :dependencies [[camel-snake-kebab "0.4.3"]]
                    :jvm-opts ["-Dclojure.compiler.direct-linking=false"]}
              :jar {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
-             :kaocha [:test {:dependencies [[lambdaisland/kaocha "1.86.1355"]]}]}
+             :kaocha [:test {:dependencies [[lambdaisland/kaocha "1.87.1366"]]}]}
   :deploy-repositories [["clojars" {:sign-releases false
                                     :url "https://clojars.org/repo"
                                     :username :env/WALTER_CLOJARS_USERNAME
