@@ -18,7 +18,7 @@
                                       "bb" "graalvm" "command-line-parser"]
                       :github/private? false}
              :provided {:dependencies [[org.clojure/clojure "1.12.0-alpha10"]
-                                       [metosin/malli "0.16.0"]]}
+                                       [metosin/malli "0.16.1"]]}
              :dev {:global-vars {*warn-on-reflection* true}
                    :dependencies [[camel-snake-kebab "0.4.3"]]
                    :jvm-opts ["-Dclojure.compiler.direct-linking=false"]}
