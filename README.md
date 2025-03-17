@@ -11,7 +11,7 @@ Configuration powertool with `metosin/malli`.
 [![cljdoc badge](https://cljdoc.org/badge/com.github.piotr-yuxuan/malli-cli)](https://cljdoc.org/d/com.github.piotr-yuxuan/malli-cli/CURRENT)
 [![GitHub license](https://img.shields.io/github/license/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/piotr-yuxuan/malli-cli)](https://github.com/piotr-yuxuan/malli-cli/issues)
-<a href="https://babashka.org" rel="nofollow"><img src="https://github.com/babashka/babashka/raw/master/logo/badge.svg" alt="bb compatible" style="max-width: 100%;"></a>
+[![bb compatible](https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg)](https://book.babashka.org#badges)
 
 # What it offers
 
