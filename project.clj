@@ -17,7 +17,7 @@
                                       "secret-management" "sourcing" "babashka"
                                       "bb" "graalvm" "command-line-parser"]
                       :github/private? false}
-             :provided {:dependencies [[org.clojure/clojure "1.12.3"]
+             :provided {:dependencies [[org.clojure/clojure "1.12.4"]
                                        [metosin/malli "0.20.0"]]}
              :dev {:global-vars {*warn-on-reflection* true}
                    :dependencies [[camel-snake-kebab "0.4.3"]]
